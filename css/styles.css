@@ -1,18 +1,33 @@
 body {
-    font-family: Arial, sans-serif;
+	font-family: Arial, sans-serif;
 	font-size: 16px;
-    text-align: center;
-    margin: 0 auto;
-    padding: 0;
-    background-color: #f9f9f9;
-	background: url("../img/nb8dkyx9.png") repeat;
+	text-align: center;
+	margin: 0 auto;
+	padding: 0;
+	background-color: #f9f9f9;
+	background-image:url("../img/nb8dkyx9.png");
+	background-repeat: repeat;
 	background-size: 15%;
 	max-width: 900px;
 	overflow: hidden;
 }
 
+.grid {
+	display: grid;
+	grid-template-columns: auto auto;
+	gap: 40px;
+	justify-content: center;
+	margin: 40px auto;
+	width: 50%;
+}
+
+.grid button {
+    width: 150px;
+    height: 150px;
+}
+
 .hidden {
-    display: none;
+	display: none;
 }
 
 @keyframes highScoreAnimation {
@@ -25,15 +40,6 @@ body {
 	animation: highScoreAnimation 1s ease-in-out infinite;
 	color: #ffd700;
 	margin: 10px;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    justify-content: center;
-    margin: 20px auto;
-	width: 50%;
 }
 
 .score {
