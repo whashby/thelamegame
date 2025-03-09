@@ -24,6 +24,8 @@ body {
 .grid button {
     width: 150px;
     height: 150px;
+    padding: 10px;
+    text-align: center;
 }
 
 .hidden {
@@ -71,14 +73,15 @@ body {
 }
 
 button {
-	font-size: 16px;
+	font-size: 20px;
 	font-weight: 500;
-    padding: 10px 20px;
+    padding: 25px 35px;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin: 0 10px;
 }
 
 button:hover {
@@ -86,13 +89,14 @@ button:hover {
 }
 
 input {
+    font-size: 20px;
     padding: 10px 20px;
     border: solid thin #007bff;
     border-radius: 5px;
 }
 
 #backNavigation {
-	margin: 10px auto;
+	margin: 20px auto;
 }
 
 #backNavigation button, #quitGameBtn {
@@ -138,10 +142,18 @@ input {
 	text-align: left;
 }
 
+#nameInputScreen button {
+    padding: 10px 20px;
+}
+
 #startGameBtn {
 	background-color: #06aa0a;
 }
 
 #startGameBtn:hover{
 	background-color: #015a05;
+}
+
+#gameScreen button {
+    padding: 10px 20px;
 }

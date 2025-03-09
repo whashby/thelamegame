@@ -22,21 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const playerScore = document.getElementById("score");
     const leaderboardList = document.getElementById("leaderboardList");
     
-    // Map game modes to their respective symbols
-    const modeSymbols = {
-        "Addition": '<i class="fa-solid fa-plus fa-4x"></i>',
-        "Subtraction": '<i class="fa-solid fa-minus fa-4x"></i>',
-        "Multiplication": '<i class="fa-solid fa-xmark fa-4x"></i>',
-        "Division": '<i class="fa-solid fa-divide fa-4x"></i>'
-    };
 
-    // Update button text dynamically
-    modeButtons.forEach(button => {
-        const mode = button.dataset.mode;
-        if (modeSymbols[mode]) {
-            button.innerHTML = modeSymbols[mode];
-        }
-    });
     // Sounds
     const clickSound = new Audio("sounds/click.mp3");
     const tickSound = new Audio("sounds/tick.mp3");
@@ -55,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let gameSetting = "";
     let timer;
     let score = 0;
-    let questionCount = 1;
+    let questionCount = 0;
     let highScores = JSON.parse(localStorage.getItem("highScores")) || {};
 
     // Start Game
@@ -72,10 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Select Game Mode
-    modeButtons.forEach((button) => {
+    modeButtons.forEach(button => {
         button.addEventListener("click", (e) => {
             clickSound.play();
-            currentMode = e.target.dataset.mode;
+            currentMode = e.target.dataset.operation;
             modeSelection.classList.add("hidden");
             difficultySelection.classList.remove("hidden");
         });
@@ -87,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
             clickSound.play();
             currentDifficulty = e.target.dataset.difficulty;
 			gameSetting = currentMode+'-'+currentDifficulty;
+            sessionStorage.setItem("gameSetting", gameSetting)
             difficultySelection.classList.add("hidden");
             startGame(gameSetting);
         });
@@ -102,10 +89,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(userAnswer == correctAnswer) {
 			correctSound.play();
 			score++;
-			if(questionCount == 10) {
+			if(questionCount == 10 && currentDifficulty == "Classic") {
 				endGame();
 			} else {
-				questionCount++;
 				generateQuestion(gameSetting);
 				startTimer();
 			}
@@ -118,18 +104,15 @@ document.addEventListener("DOMContentLoaded", () => {
 					endGame();
 				}
 				
-				questionCount++;
-				generateQuestion(gameSetting);
+                generateQuestion(gameSetting);
 				startTimer();
 			}
 		}
     });
 
 
-    // Start Game Mode
+    // Start Game
     function startGame(gameSetting) {
-		clickSound.pause();
-		questionCount = 1;
         gameScreen.classList.remove("hidden");
         generateQuestion(gameSetting);
         startTimer();
@@ -137,10 +120,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Generate Random Question
     function generateQuestion(gameSetting) {
+        questionCount++;
 		answerInput.value = "";
 		answerInput.focus();
-        const num1 = Math.floor(Math.random() * 10) + 1;
-        const num2 = Math.floor(Math.random() * 10) + 1;
+        
+        let range = 10;
+        if(gameSetting.includes("Guru")) {
+            range += Math.floor(questionCount / 10) * 10;
+        }
+        
+        let num1 = Math.floor(Math.random() * range) + 1;
+        let num2 = Math.floor(Math.random() * range) + 1;
         const operator =
             gameSetting.includes("Addition")
                 ? "+"
@@ -149,7 +139,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 : gameSetting.includes("Multiplication")
                 ? "*"
                 : "/";
-
+        
+        if(currentMode === "Division") {
+ 
+            while(num1 % num2 != 0 || num1 == num2) {
+                num1 = Math.floor(Math.random() * range) + 2;
+                num2 = Math.floor(Math.random() * range) + 2;
+            }
+        }
+        
         const correctAnswer = eval(`${num1} ${operator} ${num2}`);
         questionArea.innerText = `${num1} ${operator} ${num2}`;
         sessionStorage.setItem("correctAnswer", correctAnswer);
@@ -262,8 +260,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     chooseModeButtons.forEach((button) => {
         button.addEventListener("click", () => {
-			stopFireworks();
             clickSound.play();
+			stopFireworks();
 			score = 0;
 			questionCount = 0;
 			endGameScreen.classList.add("hidden");
