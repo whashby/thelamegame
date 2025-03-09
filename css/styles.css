@@ -30,6 +30,34 @@ body {
 	display: none;
 }
 
+.modeBtn:first-child {
+    background-color: #06c106;
+}
+
+.modeBtn:first-child:hover {
+    background-color: #037003;
+}
+
+.modeBtn:nth-child(2) {
+    background-color: #ff0000;
+}
+
+.modeBtn:nth-child(2):hover {
+    background-color: #a60000;
+}
+
+.modeBtn:nth-child(3) {
+    background-color: #ffa200;
+}
+
+.modeBtn:nth-child(3):hover {
+    background-color: #a16600;
+}
+
+.score {
+	float: right;
+}
+
 @keyframes highScoreAnimation {
 	0% { transform: scale(1); opacity: 1; }
 	50% { transform: scale(1.5); opacity: 0.5; }
@@ -40,10 +68,6 @@ body {
 	animation: highScoreAnimation 1s ease-in-out infinite;
 	color: #ffd700;
 	margin: 10px;
-}
-
-.score {
-	float: right;
 }
 
 button {
@@ -90,13 +114,12 @@ input {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('fireworks.gif') center center no-repeat;
-    background-size: cover;
+    z-index: -1;
 }
 
 #introduction {
 	text-align: justify;
-	max-width: 500px;
+	max-width: 420px;
 	margin: 5% auto;
 }
 

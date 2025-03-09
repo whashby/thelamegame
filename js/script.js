@@ -21,13 +21,29 @@ document.addEventListener("DOMContentLoaded", () => {
 	const submitAnswerButton = document.getElementById("submitAnswerBtn");
 	const playerScore = document.getElementById("score");
     const leaderboardList = document.getElementById("leaderboardList");
+    
+    // Map game modes to their respective symbols
+    const modeSymbols = {
+        "Addition": '<i class="fa-solid fa-plus fa-4x"></i>',
+        "Subtraction": '<i class="fa-solid fa-minus fa-4x"></i>',
+        "Multiplication": '<i class="fa-solid fa-xmark fa-4x"></i>',
+        "Division": '<i class="fa-solid fa-divide fa-4x"></i>'
+    };
 
+    // Update button text dynamically
+    modeButtons.forEach(button => {
+        const mode = button.dataset.mode;
+        if (modeSymbols[mode]) {
+            button.innerHTML = modeSymbols[mode];
+        }
+    });
     // Sounds
     const clickSound = new Audio("sounds/click.mp3");
     const tickSound = new Audio("sounds/tick.mp3");
     const buzzerSound = new Audio("sounds/buzzer.mp3");
     const correctSound = new Audio("sounds/correct.mp3");
     const wrongSound = new Audio("sounds/wrong.mp3");
+    const fireworksSound = new Audio("sounds/fireworks.mp3");
 
 	tickSound.currentTime = 1;
     
@@ -273,6 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	
 	function triggerFireworks() {
 		fireworks.classList.remove("hidden");
+        fireworksSound.play();
 		// Particle constructor
 		function Particle(x, y, color) {
 			this.x = x;
@@ -282,7 +299,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			this.velocityX = Math.random() * 10 - 5; // Horizontal velocity
 			this.velocityY = Math.random() * 10 - 5; // Vertical velocity
 			this.lifespan = 100; // Particle lifespan
-			this.element = fireworks.createElement('div'); // Create a div for the particle
+			this.element = document.createElement('div'); // Create a div for the particle
+            this.element.classList.add("particle");
 
 			// Style the particle
 			this.element.style.position = 'absolute';
@@ -292,7 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			this.element.style.borderRadius = '50%';
 			this.element.style.left = x + 'px';
 			this.element.style.top = y + 'px';
-			fireworks.appendChild(this.element);
+			document.body.appendChild(this.element);
 		}
 
 		// Update and render particle
@@ -348,20 +366,22 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function stopFireworks() {
+        fireworksSound.pause();
+        fireworksSound.currentTime = 0;
 		// Stop the interval that creates random fireworks
 		const highestIntervalId = window.setInterval(() => {}, 0); // Get the highest interval ID
 		for (let i = 0; i <= highestIntervalId; i++) {
-			fireworks.clearInterval(i); // Clear all intervals
+			window.clearInterval(i); // Clear all intervals
 		}
 
 		// Cancel the animation frame loop
 		const highestAnimationFrameId = window.requestAnimationFrame(() => {});
 		for (let i = 0; i <= highestAnimationFrameId; i++) {
-			fireworks.cancelAnimationFrame(i); // Cancel all animation frames
+			window.cancelAnimationFrame(i); // Cancel all animation frames
 		}
 
 		// Optionally, remove all remaining particles from the DOM
-		const particles = document.querySelectorAll('div');
+		const particles = document.querySelectorAll('.particle');
 		particles.forEach(particle => particle.remove());
 	}
 
