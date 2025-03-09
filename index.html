@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
     <div id="nameInputScreen">
 		<h2>Welcome Player! Please enter your name</h2>
         <input id="playerName" type="text" placeholder="Enter your name" autofocus>
-        <button id="startGameBtn">Start Game</button>
+        <button id="startGameBtn">Start</button>
     </div>
 
     <!-- Mode Selection -->
@@ -30,6 +30,9 @@
         <h2>Select Difficulty</h2>
         <button class="difficultyBtn" data-difficulty="Classic">Classic</button>
         <button class="difficultyBtn" data-difficulty="Guru">Guru</button>
+		<div id="backNavigation">
+			<button class="chooseModeBtn">Back</button>
+		</div>
     </div>
 
 
@@ -38,21 +41,27 @@
         <h2 id="gameModeTitle"></h2>
         <div id="questionArea"></div>
         <p id="timer">10</p>
-        <input id="answerInput" type="number" placeholder="Enter your answer" autofocus>
+        <input id="answerInput" type="text" placeholder="Enter your answer" autofocus>
         <button id="submitAnswerBtn">Submit</button>
-    </div>
-
-    <!-- Leaderboard -->
-    <div id="leaderboard" class="hidden">
-        <h2>Leaderboard</h2>
-        <ul id="leaderboardList"></ul>
-        <button id="tryAgainBtn">Try Again</button>
-        <button id="chooseModeBtn">Choose Mode</button>
-        <button id="quitGameBtn">Quit</button>
     </div>
 
     <!-- Fireworks Animation -->
     <div id="fireworks" class="hidden"></div>
+	
+	<!-- EndGame Screen -->
+    <div id="endGameScreen" class="hidden">
+        <h2>Your Score<br><span id="score"></span></h2>
+        <div id="highScoreMessage" class="hidden"><h1>New High Score!</h1></div>
+		<button id="tryAgainBtn">Try Again</button>
+		<button class="chooseModeBtn">Choose Mode</button>
+		<button id="quitGameBtn">Quit</button>
+		<!-- Leaderboard -->
+		<div id="leaderboard" class="hidden">
+			<h2>Leaderboard</h2>
+			<ul id="leaderboardList"></ul>
+		</div>
+	</div>
+
 
     <script src="js/script.js"></script>
 </body>

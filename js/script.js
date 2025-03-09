@@ -6,17 +6,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const modeSelection = document.getElementById("modeSelection");
     const difficultySelection = document.getElementById("difficultySelection");
     const gameScreen = document.getElementById("gameScreen");
+    const endGameScreen = document.getElementById("endGameScreen");
+	const highScoreMessage = document.getElementById("highScoreMessage");
     const leaderboard = document.getElementById("leaderboard");
     const fireworks = document.getElementById("fireworks");
     const modeButtons = document.querySelectorAll(".modeBtn");
     const difficultyButtons = document.querySelectorAll(".difficultyBtn");
     const tryAgainButton = document.getElementById("tryAgainBtn");
-    const chooseModeButton = document.getElementById("chooseModeBtn");
+    const chooseModeButtons = document.querySelectorAll(".chooseModeBtn");
     const quitGameButton = document.getElementById("quitGameBtn");
     const timerElement = document.getElementById("timer");
     const questionArea = document.getElementById("questionArea");
     const answerInput = document.getElementById("answerInput");
 	const submitAnswerButton = document.getElementById("submitAnswerBtn");
+	const playerScore = document.getElementById("score");
     const leaderboardList = document.getElementById("leaderboardList");
 
     // Sounds
@@ -25,6 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const buzzerSound = new Audio("sounds/buzzer.mp3");
     const correctSound = new Audio("sounds/correct.mp3");
     const wrongSound = new Audio("sounds/wrong.mp3");
+
+	tickSound.currentTime = 1;
 
     // Game State
     let playerName = "";
@@ -44,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Please enter a valid name.");
             return;
         }
-        localStorage.setItem("playerName", playerName);
+        sessionStorage.setItem("playerName", playerName);
         nameInputScreen.classList.add("hidden");
         modeSelection.classList.remove("hidden");
     });
@@ -72,12 +77,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	
     // Validate Answer
     submitAnswerButton.addEventListener("click", () => {
-		clearInterval(timer);
-		clickSound.play();
-		
 		const userAnswer = parseFloat(answerInput.value);
-		const correctAnswer = localStorage.getItem("correctAnswer");
+		const correctAnswer = sessionStorage.getItem("correctAnswer");
 
+		stopTimer();
+		
 		if(userAnswer == correctAnswer) {
 			correctSound.play();
 			score++;
@@ -85,9 +89,9 @@ document.addEventListener("DOMContentLoaded", () => {
 				endGame();
 			} else {
 				questionCount++;
+				generateQuestion(gameSetting);
+				startTimer();
 			}
-			generateQuestion(gameSetting);
-			startTimer();
 		} else {
 			wrongSound.play();
 			if(currentDifficulty == "Guru") {
@@ -95,12 +99,11 @@ document.addEventListener("DOMContentLoaded", () => {
 			} else {
 				if(questionCount == 10) {
 					endGame();
-				} else {
-					questionCount++;
 				}
+				
+				questionCount++;
 				generateQuestion(gameSetting);
 				startTimer();
-
 			}
 		}
     });
@@ -108,6 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Start Game Mode
     function startGame(gameSetting) {
+		clickSound.pause();
 		questionCount = 1;
         gameScreen.classList.remove("hidden");
         generateQuestion(gameSetting);
@@ -116,6 +120,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Generate Random Question
     function generateQuestion(gameSetting) {
+		answerInput.value = "";
+		answerInput.focus();
         const num1 = Math.floor(Math.random() * 10) + 1;
         const num2 = Math.floor(Math.random() * 10) + 1;
         const operator =
@@ -129,12 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const correctAnswer = eval(`${num1} ${operator} ${num2}`);
         questionArea.innerText = `${num1} ${operator} ${num2}`;
-        localStorage.setItem("correctAnswer", correctAnswer);
+        sessionStorage.setItem("correctAnswer", correctAnswer);
     }
 
     // Timer
     function startTimer() {
-        let timeLeft = 10;
+		let timeLeft = 10;
         timerElement.innerText = timeLeft;
 
         timer = setInterval(() => {
@@ -144,31 +150,83 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (timeLeft <= 0) {
                 clearInterval(timer);
+				tickSound.pause();
+				tickSound.currentTime = 0;
                 buzzerSound.play();
                 endGame();
             }
         }, 1000);
     }
 
+	function stopTimer() {
+		if (timer) {
+			tickSound.pause();
+			tickSound.currentTime = 1;
+			clearInterval(timer);
+			timer = null; // Reset the timer variable
+		}
+	}
     // End Game
     function endGame() {
+		stopTimer();
+		buzzerSound.pause();
+		buzzerSound.currentTime = 0;
+		wrongSound.pause();
+		wrongSound.currentTime = 0;
         gameScreen.classList.add("hidden");
-        leaderboard.classList.remove("hidden");
-        updateLeaderboard();
-    }
+		endGameScreen.classList.remove("hidden");
+		playerScore.innerHTML = score;
+		leaderboard.classList.remove("hidden");
+		checkHighScore();
+		updateLeaderboard();
+	}
+	
+	// Check Highscore
+	function checkHighScore() {
+		if(highScores[gameSetting]) {
+			const modeScores = highScores[gameSetting];
+			const playerIndex = modeScores.findIndex(entry => entry.name === playerName);
+
+			if (playerIndex !== -1) {
+				if (score > modeScores[playerIndex].score) {
+					highScoreMessage.classList.remove("hidden");
+					triggerFireworks();
+				}
+			}
+		}
+		
+	}
 
     // Update Leaderboard
-    function updateLeaderboard() {
-        const modeScores = highScores[gameSetting] || [];
-        modeScores.push(score);
-        modeScores.sort((a, b) => b - a); // Sort descending
-        highScores[gameSetting] = modeScores.slice(0, 10); // Top 10 scores
-        localStorage.setItem("highScores", JSON.stringify(highScores));
+	function updateLeaderboard() {
+		// Initialize if no high scores exist for the mode
+		if (!highScores[gameSetting]) {
+			highScores[gameSetting] = []; 
+		}
 
+		const modeScores = highScores[gameSetting];
+		const playerIndex = modeScores.findIndex(entry => entry.name === playerName);
+
+		if (playerIndex !== -1) {
+			if (score > modeScores[playerIndex].score) {
+				modeScores[playerIndex].score = score;
+			}
+		} else {
+			modeScores.push({ name: playerName, score: score });
+		}
+
+		modeScores.sort((a, b) => b.score - a.score);
+		highScores[gameSetting] = modeScores.slice(0, 10);
+		localStorage.setItem("highScores", JSON.stringify(highScores));
+		displayLeaderboard();
+
+	}
+				
+	function displayLeaderboard() {
         leaderboardList.innerHTML = "";
-        highScores[gameSetting].forEach((score, index) => {
+        highScores[gameSetting].forEach((entry, index) => {
             const li = document.createElement("li");
-            li.textContent = `${index + 1}. ${score}`;
+            li.innerHTML = `${index + 1}. ${entry.name}: ` + '<span class="score">'+`${entry.score}</span>`;
             if (index === 0) li.style.fontWeight = "bold"; // Highlight top score
             leaderboardList.appendChild(li);
         });
@@ -176,20 +234,134 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Buttons
     tryAgainButton.addEventListener("click", () => {
+		stopFireworks();
+        clickSound.play();
+		score = 0;
+		questionCount = 0;
+		endGameScreen.classList.add("hidden");
         leaderboard.classList.add("hidden");
         startGame(gameSetting);
     });
 
-    chooseModeButton.addEventListener("click", () => {
-        leaderboard.classList.add("hidden");
-        modeSelection.classList.remove("hidden");
+    chooseModeButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+			stopFireworks();
+            clickSound.play();
+			score = 0;
+			questionCount = 0;
+			endGameScreen.classList.add("hidden");
+			leaderboard.classList.add("hidden");
+			difficultySelection.classList.add("hidden");
+			modeSelection.classList.remove("hidden");
+        });
     });
 
-    quitGameButton.addEventListener("click", () => {
+	quitGameButton.addEventListener("click", () => {
+		stopFireworks();
+        clickSound.play();
 		score = 0;
 		questionCount = 0;
-        localStorage.removeItem("playerName");
+		playerNameInput.value = "";
+        sessionStorage.removeItem("playerName");
+        sessionStorage.removeItem("correctAnswer");
+		endGameScreen.classList.add("hidden");
         leaderboard.classList.add("hidden");
         nameInputScreen.classList.remove("hidden");
+		playerNameInput.focus();
     });
+	
+	function triggerFireworks() {
+		fireworks.classList.remove("hidden");
+		// Particle constructor
+		function Particle(x, y, color) {
+			this.x = x;
+			this.y = y;
+			this.color = color;
+			this.size = Math.random() * 10 + 5; // Particle size
+			this.velocityX = Math.random() * 10 - 5; // Horizontal velocity
+			this.velocityY = Math.random() * 10 - 5; // Vertical velocity
+			this.lifespan = 100; // Particle lifespan
+			this.element = fireworks.createElement('div'); // Create a div for the particle
+
+			// Style the particle
+			this.element.style.position = 'absolute';
+			this.element.style.width = this.size + 'px';
+			this.element.style.height = this.size + 'px';
+			this.element.style.backgroundColor = this.color;
+			this.element.style.borderRadius = '50%';
+			this.element.style.left = x + 'px';
+			this.element.style.top = y + 'px';
+			fireworks.appendChild(this.element);
+		}
+
+		// Update and render particle
+		Particle.prototype.update = function () {
+			this.x += this.velocityX;
+			this.y += this.velocityY;
+			this.velocityY += 0.1; // Simulate gravity
+			this.lifespan -= 1;
+
+			// Update position and opacity
+			this.element.style.left = this.x + 'px';
+			this.element.style.top = this.y + 'px';
+			this.element.style.opacity = this.lifespan / 100;
+
+			// Remove particle when lifespan ends
+			if (this.lifespan <= 0) {
+				this.element.remove();
+			}
+		};
+
+		// Create fireworks at given coordinates
+		function createFirework(x, y) {
+				for (let i = 0; i < 50; i++) {
+					const color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+					const particle = new Particle(x, y, color);
+					particles.push(particle);
+				}
+			}
+
+		// Animation loop
+		const particles = [];
+		function animate() {
+			particles.forEach((p, index) => {
+				p.update();
+				if (p.lifespan <= 0) {
+					particles.splice(index, 1); // Remove expired particles
+				}
+			});
+			requestAnimationFrame(animate);
+		}
+
+		// Automate fireworks
+		// Function to create a firework at a random position
+		function createRandomFirework() {
+			const x = Math.random() * window.innerWidth; // Random x-coordinate
+			const y = Math.random() * window.innerHeight / 2; // Random y-coordinate (upper half of canvas)
+			createFirework(x, y);
+		}
+
+		// Automate fireworks every 1 second
+		setInterval(createRandomFirework, 500); // Adjust the interval (1000ms = 1 second) as needed
+		animate();
+	}
+
+	function stopFireworks() {
+		// Stop the interval that creates random fireworks
+		const highestIntervalId = window.setInterval(() => {}, 0); // Get the highest interval ID
+		for (let i = 0; i <= highestIntervalId; i++) {
+			fireworks.clearInterval(i); // Clear all intervals
+		}
+
+		// Cancel the animation frame loop
+		const highestAnimationFrameId = window.requestAnimationFrame(() => {});
+		for (let i = 0; i <= highestAnimationFrameId; i++) {
+			fireworks.cancelAnimationFrame(i); // Cancel all animation frames
+		}
+
+		// Optionally, remove all remaining particles from the DOM
+		const particles = document.querySelectorAll('div');
+		particles.forEach(particle => particle.remove());
+	}
+
 });

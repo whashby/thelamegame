@@ -1,5 +1,6 @@
 body {
     font-family: Arial, sans-serif;
+	font-size: 16px;
     text-align: center;
     margin: 0 auto;
     padding: 0;
@@ -12,6 +13,18 @@ body {
     display: none;
 }
 
+@keyframes highScoreAnimation {
+	0% { transform: scale(1); opacity: 1; }
+	50% { transform: scale(1.5); opacity: 0.5; }
+	100% { transform: scale(1); opacity: 1; }
+}
+
+#highScoreMessage {
+	animation: highScoreAnimation 1s ease-in-out infinite;
+	color: #ffd700;
+	margin: 10px;
+}
+
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -21,7 +34,13 @@ body {
 	width: 50%;
 }
 
+.score {
+	float: right;
+}
+
 button {
+	font-size: 16px;
+	font-weight: 500;
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -40,6 +59,22 @@ input {
     border-radius: 5px;
 }
 
+#backNavigation {
+	margin: 10px auto;
+}
+
+#backNavigation button, #quitGameBtn {
+    background-color: #ff0000;
+}
+
+#backNavigation button:hover, #quitGameBtn:hover {
+    background-color: #990000;
+}
+
+#endGameScreen {
+	z-index: 99999;
+}
+
 /* Fireworks Animation */
 #fireworks {
     position: fixed;
@@ -49,4 +84,27 @@ input {
     height: 100%;
     background: url('fireworks.gif') center center no-repeat;
     background-size: cover;
+}
+
+#leaderboard {
+	width: auto;
+	max-width: 40%;
+	margin: 10px auto;
+}
+
+#leaderboardList {
+	list-style-type: none;
+	padding: 0;
+}
+
+#leaderboardList li{
+	text-align: left;
+}
+
+#startGameBtn {
+	background-color: #06aa0a;
+}
+
+#startGameBtn:hover{
+	background-color: #015a05;
 }
