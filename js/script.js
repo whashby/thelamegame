@@ -31,13 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	tickSound.currentTime = 1;
     
-    // File System Object
-    const fs = require("fs");
-    
-    fs.open("leaderboard.ini", "r+", (err, file) => {
-       if(err) throw err;
-        console.log(file);
-    });
 
     // Game State
     let playerName = "";
