@@ -1,1 +1,1 @@
-# LAME-Game
+#the LAME Game
