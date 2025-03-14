@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const fireworksSound = new Audio("sounds/fireworks.mp3");
 
 	tickSound.currentTime = 1;
-    
+    fireworksSound.volume = 0.5;
 
     // Game State
     let playerName = "";
