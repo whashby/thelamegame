@@ -199,19 +199,27 @@ document.addEventListener("DOMContentLoaded", () => {
 	// Check Highscore
 	function checkHighScore() {
 		if(highScores[gameSetting]) {
-			const modeScores = highScores[gameSetting];
-			const playerIndex = modeScores.findIndex(entry => entry.name === playerName);
-
-			if (playerIndex !== -1) {
-				if (score > modeScores[playerIndex].score) {
-					highScoreMessage.classList.remove("hidden");
-					triggerFireworks();
-				}
+            const gameHighScores = highScores[gameSetting];
+            const highestScore = gameHighScores[0].score;
+            console.log(highestScore);
+			const playerIndex = gameHighScores.findIndex(entry => entry.name === playerName);
+            
+alert("player index: " + playerIndex + " highest score: " + highestScore + " currrent score: " + score);
+			if (playerIndex !== -1){
+                if(score > highestScore) {
+                    highScoreMessage.classList.remove("hidden");
+                    triggerFireworks();
+                }
 			}
-		}
-		
+		} else {
+            if(score > 0){
+                highScoreMessage.classList.remove("hidden");
+                triggerFireworks();
+            }
+        }
 	}
 
+    
     // Update Leaderboard
 	function updateLeaderboard() {
 		// Initialize if no high scores exist for the mode
@@ -256,6 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		questionCount = 0;
 		endGameScreen.classList.add("hidden");
         leaderboard.classList.add("hidden");
+        highScoreMessage.classList.add("hidden");
         startGame(gameSetting);
     });
 
@@ -267,6 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			questionCount = 0;
 			endGameScreen.classList.add("hidden");
 			leaderboard.classList.add("hidden");
+            highScoreMessage.classList.add("hidden");
 			difficultySelection.classList.add("hidden");
 			modeSelection.classList.remove("hidden");
         });
@@ -282,6 +292,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sessionStorage.removeItem("correctAnswer");
 		endGameScreen.classList.add("hidden");
         leaderboard.classList.add("hidden");
+        highScoreMessage.classList.add("hidden");
         nameInputScreen.classList.remove("hidden");
 		playerNameInput.focus();
     });
