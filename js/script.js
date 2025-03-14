@@ -96,6 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
 				startTimer();
 			}
 		} else {
+            tickSound.pause();
+            tickSound.currentTime = 0;
 			wrongSound.play();
 			if(currentDifficulty == "Guru") {
 				endGame();
