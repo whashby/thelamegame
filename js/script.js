@@ -201,10 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(highScores[gameSetting]) {
             const gameHighScores = highScores[gameSetting];
             const highestScore = gameHighScores[0].score;
-            console.log(highestScore);
-			const playerIndex = gameHighScores.findIndex(entry => entry.name === playerName);
+            const playerIndex = gameHighScores.findIndex(entry => entry.name === playerName);
             
-alert("player index: " + playerIndex + " highest score: " + highestScore + " currrent score: " + score);
 			if (playerIndex !== -1){
                 if(score > highestScore) {
                     highScoreMessage.classList.remove("hidden");
