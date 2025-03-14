@@ -33,7 +33,7 @@ body {
 }
 
 .modeBtn:first-child {
-    background-color: #06c106;
+    background: #06c106 url("../img/add.png") center no-repeat;
 }
 
 .modeBtn:first-child:hover {
@@ -41,7 +41,7 @@ body {
 }
 
 .modeBtn:nth-child(2) {
-    background-color: #ff0000;
+    background: #ff0000 url("../img/subtract.png") center no-repeat;
 }
 
 .modeBtn:nth-child(2):hover {
@@ -49,11 +49,17 @@ body {
 }
 
 .modeBtn:nth-child(3) {
-    background-color: #ffa200;
+    background: #ffa200 url("../img/multiply.png") center no-repeat;    
 }
 
 .modeBtn:nth-child(3):hover {
     background-color: #a16600;
+}
+
+.grid button:last-child {
+    background-image: url("../img/divide.png");
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .score {

@@ -222,6 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		const modeScores = highScores[gameSetting];
 		const playerIndex = modeScores.findIndex(entry => entry.name === playerName);
 
+
 		if (playerIndex !== -1) {
 			if (score > modeScores[playerIndex].score) {
 				modeScores[playerIndex].score = score;
