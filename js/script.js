@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         if(currentMode === "Division") {
  
-            while(num1 % num2 != 0 || num1 == num2) {
+            while(num1 % num2 != 0 || num1 == num2 || num1 < num2) {
                 num1 = Math.floor(Math.random() * range) + 2;
                 num2 = Math.floor(Math.random() * range) + 2;
             }
