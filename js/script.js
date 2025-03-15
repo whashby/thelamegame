@@ -85,11 +85,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		const correctAnswer = sessionStorage.getItem("correctAnswer");
 
 		stopTimer();
+        resetSounds(); //added as test but doesn't affect function
 		
 		if(userAnswer == correctAnswer) {
 			correctSound.play();
 			score++;
-			if(questionCount == 10 && currentDifficulty == "Classic") {
+
+            if(questionCount == 10 && currentDifficulty == "Classic") {
 				endGame();
 			} else {
 				generateQuestion(gameSetting);
@@ -99,7 +101,9 @@ document.addEventListener("DOMContentLoaded", () => {
             tickSound.pause();
             tickSound.currentTime = 0;
 			wrongSound.play();
-			if(currentDifficulty == "Guru") {
+            resetSounds();
+
+            if(currentDifficulty == "Guru") {
 				endGame();
 			} else {
 				if(questionCount == 10) {
@@ -122,6 +126,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Generate Random Question
     function generateQuestion(gameSetting) {
+        resetSounds();
+
         questionCount++;
 		answerInput.value = "";
 		answerInput.focus();
@@ -155,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sessionStorage.setItem("correctAnswer", correctAnswer);
     }
 
-    // Timer
+    // Init Timer
     function startTimer() {
 		let timeLeft = 10;
         timerElement.innerText = timeLeft;
@@ -175,6 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     }
 
+    // Stop Timer
 	function stopTimer() {
 		if (timer) {
 			tickSound.pause();
@@ -186,16 +193,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // End Game
     function endGame() {
 		stopTimer();
-		buzzerSound.pause();
-		buzzerSound.currentTime = 0;
-		wrongSound.pause();
-		wrongSound.currentTime = 0;
+        resetSounds();
+        
         gameScreen.classList.add("hidden");
-		endGameScreen.classList.remove("hidden");
-		playerScore.innerHTML = score;
-		leaderboard.classList.remove("hidden");
-		checkHighScore();
-		updateLeaderboard();
+        endGameScreen.classList.remove("hidden");
+        playerScore.innerHTML = score;
+        leaderboard.classList.remove("hidden");
+        checkHighScore();
+        updateLeaderboard();
 	}
 	
 	// Check Highscore
@@ -203,16 +208,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(highScores[gameSetting]) {
             const gameHighScores = highScores[gameSetting];
             const highestScore = gameHighScores[0].score;
-            const playerIndex = gameHighScores.findIndex(entry => entry.name === playerName);
             
-			if (playerIndex !== -1){
-                if(score > highestScore) {
+            if(score > highestScore) {
                     highScoreMessage.classList.remove("hidden");
                     triggerFireworks();
-                }
-			}
+            }
 		} else {
-            if(score > 0){
+            if(score > 0) {
                 highScoreMessage.classList.remove("hidden");
                 triggerFireworks();
             }
@@ -251,7 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
         highScores[gameSetting].forEach((entry, index) => {
             const li = document.createElement("li");
             li.innerHTML = `${index + 1}. ${entry.name}: ` + '<span class="score">'+`${entry.score}</span>`;
-            if (index === 0) li.style.fontWeight = "bold"; // Highlight top score
+            if (entry.name === playerName) li.style.fontWeight = "bold"; // Highlight top score
             leaderboardList.appendChild(li);
         });
     }
@@ -394,5 +396,28 @@ document.addEventListener("DOMContentLoaded", () => {
 		const particles = document.querySelectorAll('.particle');
 		particles.forEach(particle => particle.remove());
 	}
+    
+    // Stop Playback
+    function resetSounds() {
+        if(buzzerSound.currentTime > 0) {
+            buzzerSound.pause();
+            buzzerSound.currentTime = 0;
+        }
+		
+        if(wrongSound.currentTime > 0) {
+            wrongSound.pause();
+            wrongSound.currentTime = 0;
+        }
+        
+        if(correctSound.currentTime > 0) {
+            correctSound.pause();
+            correctSound.currentTime = 0;
+        }
+        
+        if(tickSound.currentTime > 0) {
+            tickSound.pause();
+            tickSound.currentTime = 0;
+        }
+    }
 
 });
