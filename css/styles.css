@@ -74,7 +74,8 @@ body {
 
 #highScoreMessage {
 	animation: highScoreAnimation 1s ease-in-out infinite;
-	color: #ffd700;
+	color: #ff7700;
+    text-decoration-style: solid;
 	margin: 10px;
 }
 
