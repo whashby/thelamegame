@@ -57,9 +57,10 @@ body {
 }
 
 .grid button:last-child {
-    background-image: url("../img/divide.png");
-    background-repeat: no-repeat;
-    background-position: center;
+	background-color: #337bff;
+	background-image: url("../img/divide.png");
+	background-repeat: no-repeat;
+	background-position: center;
 }
 
 .score {
@@ -83,7 +84,7 @@ button {
 	font-size: 20px;
 	font-weight: 500;
     padding: 25px 35px;
-    background-color: #007bff;
+    background-color: #000000;
     color: white;
     border: none;
     border-radius: 5px;
@@ -92,7 +93,7 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #a16600;
 }
 
 input {
@@ -159,6 +160,12 @@ input {
 
 #startGameBtn:hover{
 	background-color: #015a05;
+}
+
+#storyText {
+    text-align: justify;
+    max-width: 1024px;
+    margin: 5% auto;
 }
 
 #gameScreen button {

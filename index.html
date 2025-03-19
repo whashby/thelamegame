@@ -9,26 +9,27 @@
 </head>
 <body>
     <h1>The LAME Game</h1>
-	<!-- Name Input Screen -->
+    <!-- Name Input Screen -->
     <div id="nameInputScreen">
-		<h2>Welcome Player! Please enter your name</h2>
-        <input id="playerName" type="text" placeholder="Enter your name" autofocus>
+        <h2>Welcome Player! Please enter your name</h2>
+        <input id="playerName" type="text" maxlength="15" placeholder="Enter your name" autocomplete="off" autofocus required>
         <button id="startGameBtn">Start</button>
-		
-		<section>
-			<article id="introduction">
-              <p>Welcome to The LAME Game - where mathematics meets fun and challenge! Get ready to flex your brain and prove your mastery over numbers. Choose from Addition, Subtraction, Multiplication, or Division, and dive into two exciting difficulty levels:</p>
-              <ul>
-                <li>Classic: Test yourself with 10 timed questions. Can you race against the clock?</li>
-                <li>Guru: Endless challenges with increasing difficulty - one wrong answer, and it's game over!</li>
-              </ul>
-              <p>Enter your name to begin this journey of numbers and strategy. Are you ready to claim a spot on the leaderboard and light up the skies with fireworks? Let’s make math LAME: Loads of Amazing, Mind-blowing Entertainment!</p>
-          </article>
-		</section>
+
+        <section>
+            <article id="introduction">
+                <p>Welcome to The LAME Game - where mathematics meets fun and challenge! Get ready to flex your brain and prove your mastery over numbers. Choose from Addition, Subtraction, Multiplication, or Division, and dive into two exciting difficulty levels:</p>
+                <ul>
+                    <li>Classic: Test yourself with 10 timed questions. Can you race against the clock?</li>
+                    <li>Guru: Endless challenges with increasing difficulty - one wrong answer, and it's game over!</li>
+                </ul>
+                <p>Enter your name to begin this journey of numbers and strategy. Are you ready to claim a spot on the leaderboard and light up the skies with fireworks? Let’s make math LAME: Loads of Amazing, Mind-blowing Entertainment!</p>
+            </article>
+        </section>
     </div>
 
     <!-- Mode Selection -->
     <div id="modeSelection" class="hidden">
+        <h3 id="welcomeMessage" class="hidden"></h3>
         <h2>Select Game Mode</h2>
         <div class="grid">
             <button class="modeBtn" data-operation="Addition"></button>
@@ -36,21 +37,23 @@
             <button class="modeBtn" data-operation="Multiplication"></button>
             <button class="modeBtn" data-operation="Division"></button>
         </div>
+        <h2>...Or go on an adventure</h2>
+        <button class="modeBtn" data-operation="Story">Neural Nexus: The Mind Maze</button>
     </div>
-	
+
     <!-- Difficulty Selection -->
-	<div id="difficultySelection" class="hidden">
+    <div id="difficultySelection" class="hidden">
         <h2>Select Difficulty</h2>
         <button class="difficultyBtn" data-difficulty="Classic">Classic</button>
         <button class="difficultyBtn" data-difficulty="Guru">Guru</button>
-		<div id="backNavigation">
-			<button class="chooseModeBtn">Back</button>
-		</div>
+        <div id="backNavigation">
+            <button class="chooseModeBtn">Back</button>
+        </div>
     </div>
 
 
     <!-- Game Screen -->
-    <div id="gameScreen" class="hidden">
+    <div id="standardGameScreen" class="hidden">
         <h2 id="gameModeTitle"></h2>
         <div id="questionArea"></div>
         <input id="answerInput" type="text" placeholder="Enter your answer" autofocus>
@@ -58,22 +61,81 @@
         <button id="submitAnswerBtn">Submit</button>
     </div>
 
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Story Mode -->
+    <div id="storyModeScreen" class="hidden">
+        <h2>Neural Nexus: The Mind Maze</h2>
+        <p id="storyText">
+            <span id="player"></span>, you're a cyber-hacker who has been trapped inside a rogue AI's digital domain — a labyrinth of neural networks where reality bends. The AI, named Spectra, challenges you to beat its mind games to escape.
+            Each layer of the domain presents intricate logic and math-based puzzles. Solve them and regain your freedom, or your consciousness will be merged with the AI, forever!
+        </p>
+        <button id="assimilateBtn">Assimilate</button>
+        <button id="escapeBtn">Escape!</button>
+    </div>
+
+    <div id="storyGameScreen" class="hidden">
+        <h2>Neural Nexus: The Mind Maze</h2>
+        <h1 id="levelTitle">Level 1: Prime Decryption</h1>
+        <p id="levelDescription">Decode the primes hidden in the sequence to proceed.</p>
+        <div id="questionContainer">
+            <p id="question"></p>
+            <input type="text" id="playerAnswer" placeholder="Your answer">
+            <button id="submitBtn">Submit</button>
+        </div>
+        <p id="feedback"></p>
+        <button id="nextLevelBtn" style="display: none;">Next Level</button>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <!-- Fireworks Animation -->
     <div id="fireworks" class="hidden"></div>
-	
-	<!-- EndGame Screen -->
+
+    <!-- EndGame Screen -->
     <div id="endGameScreen" class="hidden">
-        <h2>Your Score<br><span id="score"></span></h2>
+        <h2>Your Score</h2>
+        <p>Correct Answers: <span id="playerScore"></span></p>
+        <p>Multiplier Bonus: <span id="multiplierBonus"></span>x</p>
+        <p>Time Bonus: <span id="timeBonus"></span></p>
+        <hr />
+        <h3>Total Score: <span id="totalScore"></span></h3>
         <div id="highScoreMessage" class="hidden"><h1>New High Score!</h1></div>
-		<button id="tryAgainBtn">Try Again</button>
-		<button class="chooseModeBtn">Choose Mode</button>
-		<button id="quitGameBtn">Quit</button>
-		<!-- Leaderboard -->
-		<div id="leaderboard" class="hidden">
-			<h2>Leaderboard</h2>
-			<ul id="leaderboardList"></ul>
-		</div>
-	</div>
+        <button id="tryAgainBtn">Try Again</button>
+        <button class="chooseModeBtn">Choose Mode</button>
+        <button id="quitGameBtn">Quit</button>
+        <!-- Leaderboard -->
+        <div id="leaderboard" class="hidden">
+            <h2>Leaderboard</h2>
+            <ul id="leaderboardList"></ul>
+        </div>
+    </div>
 
 
     <script src="js/script.js"></script>
