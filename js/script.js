@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let questionCount = 0;
     let range = 10;
     let timeScore = 0;
-    let version;
+    let version = 1;
 
     const levels = {
         1: {
@@ -557,6 +557,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         request.onsuccess = function (event) {
 
+            version += db.version;
             // Open the database and transaction
             const db = event.target.result;
             const transaction = db.transaction(gameSetting, 'readwrite');
@@ -564,7 +565,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const getRequest = objectStore.get(playerName);
 
-            version = db.version;
 
             getRequest.onsuccess = function () {
                 const existingHighScore = getRequest.result;
