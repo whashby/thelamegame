@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let questionCount = 0;
     let range = 10;
     let timeScore = 0;
-    let version = 1;
+    let version = 1 + localStorage.getItem("version") || 1;
 
     const levels = {
         1: {
@@ -546,7 +546,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         request.onupgradeneeded = function (event) {
-            const db = event.target.result;
+            console.log("Upgrading database:", event.target.result);
+            console.log("Version:", version);
+            console.log("Game Setting:", gameSetting);
+
+
+            let db = event.target.result;
             // Create an object store for high scores if it doesn't exist
             if (!db.objectStoreNames.contains(gameSetting)) {
                 const objectStore = db.createObjectStore(gameSetting, { keyPath: 'playerName' });
@@ -557,9 +562,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         request.onsuccess = function (event) {
 
-            version += db.version;
+            console.log("Database opened successfully:", event.target.result);
+
+            version = 1 + event.target.result.version;
+
             // Open the database and transaction
-            const db = event.target.result;
+            let db = event.target.result;
             const transaction = db.transaction(gameSetting, 'readwrite');
             const objectStore = transaction.objectStore(gameSetting);
 
@@ -569,7 +577,9 @@ document.addEventListener("DOMContentLoaded", () => {
             getRequest.onsuccess = function () {
                 const existingHighScore = getRequest.result;
                 if (existingHighScore) {
+
                     console.log("Updating record:", existingHighScore);
+
                     // Update the score if the new score is higher
                     if (score > existingHighScore.score) {
                         existingHighScore.score = score;
@@ -586,6 +596,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     };
 
                 } else {
+
+                    // Add a new record if it doesn't exist
                     console.log("Adding Record:", playerName);
                     const newHighScore = { playerName: playerName, score: score };
                     const addRequest = objectStore.add(newHighScore);
@@ -594,6 +606,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         console.log("Record added successfully:", newHighScore);
                     };
 
+                    // Handle error for adding record
                     addRequest.onerror = function (event) {
                         console.error('Error adding record:', event.target.error);
                     };
