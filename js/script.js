@@ -449,21 +449,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
    // Start Fireworks Animation
 	const triggerFireworks = () => {
-		fireworks.classList.remove("hidden");
+	
+        fireworks.classList.remove("hidden");
         fireworksSound.play();
-
-		// Particle constructor
+		
+        
+        // Particle constructor
 		function Particle(x, y, color) {
 			this.x = x;
 			this.y = y;
 			this.color = color;
+			this.element = document.createElement('div'); // Create a div for the particle
+            this.element.classList.add("particle");
 			this.lifespan = 100; // Particle lifespan
 			this.size = Math.random() * 10 + 5; // Particle size
 			this.velocityX = Math.random() * 10 - 5; // Horizontal velocity
 			this.velocityY = Math.random() * 10 - 5; // Vertical velocity
-
-			this.element = document.createElement('div'); // Create a div for the particle
-            this.element.classList.add("particle");
 
 			// Style the particle
 			this.element.style.backgroundColor = this.color;
@@ -487,7 +488,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			// Update position and opacity
 			this.element.style.left = this.x + 'px';
 			this.element.style.opacity = this.lifespan / 100;
-            this.element.style.top = this.y + 'px';
+			this.element.style.top = this.y + 'px';
 
 			// Remove particle when lifespan ends
 			if (this.lifespan <= 0) {
@@ -498,39 +499,37 @@ document.addEventListener("DOMContentLoaded", () => {
 		// Create fireworks at given coordinates
 		const createFirework = (x, y) => {
 			for (let i = 0; i < 50; i++) {
-				const color = 'rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})';
+				const color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
 				const particle = new Particle(x, y, color);
 				particles.push(particle);
 			}
 		};
+            
 
 		// Animation loop
 		const particles = [];
-
-        const animate = () => {
-            particles.forEach((p, index) => {
-                p.update();
-                if (p.lifespan <= 0) {
-                    particles.splice(index, 1); // Remove expired particles
-                }
-            });
-
-            requestAnimationFrame(animate);
-        };
+		const animate = () => {
+			particles.forEach((p, index) => {
+				p.update();
+				if (p.lifespan <= 0) {
+					particles.splice(index, 1); // Remove expired particles
+				}
+			});
+			requestAnimationFrame(animate);
+		};
 
 		// Automate fireworks
 		// Function to create a firework at a random position
-        const createRandomFirework = () => {
-            const x = Math.random() * window.innerWidth; // Random x-coordinate
-            const y = Math.random() * window.innerHeight / 2; // Random y-coordinate (upper half of canvas)
-
-            createFirework(x, y);
-        };
+		const createRandomFirework = () => {
+			const x = Math.random() * window.innerWidth; // Random x-coordinate
+			const y = Math.random() * window.innerHeight / 2; // Random y-coordinate (upper half of canvas)
+			createFirework(x, y);
+		}
 
 		// Automate fireworks every 1 second
 		setInterval(createRandomFirework, 500); // Adjust the interval (1000ms = 1 second) as needed
 		animate();
-    };
+	};
 
     // Open or create openHighScoresDB database
     const updateHighScores = (score, playerName, gameSetting) => {
@@ -850,32 +849,5 @@ document.addEventListener("DOMContentLoaded", () => {
         highScoreMessage.classList.add("hidden");
         startGame(gameSetting);
     });
-
-
-
-
-
-
-
-
-
-
-    /*
-    const fs = require("fs");
-
-    const writeToFile = (filePath, data) => {
-        fs.writeFile(filePath, data, (err) => {
-            if (err) {
-                console.error("Error writing to file:", err);
-            } else {
-                console.log("File written successfully!");
-            }
-        });
-    };
-
-    // Example: Writing to "example.txt"
-    const data = "This is the data to be written to the file.";
-    writeToFile("example.txt", data);
-
-    */
+    
 });
