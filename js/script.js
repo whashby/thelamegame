@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let questionCount = 0;
     let range = 10;
     let timeScore = 0;
-    let version = 1 + localStorage.getItem("version") || 1;
+    let version = localStorage.getItem("version") != null? 1 + localStorage.getItem("version") : 1;
 
     const levels = {
         1: {
@@ -358,7 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-        updateHighScores(finalScore, playerName, gameSetting);
+        updateHighScoresDB(finalScore, playerName, gameSetting);
         checkHighScore();
         updateLeaderboard();
     };
@@ -532,91 +532,68 @@ document.addEventListener("DOMContentLoaded", () => {
 	};
 
     // Open or create openHighScoresDB database
-    const updateHighScores = (score, playerName, gameSetting) => {
+    const updateHighScoresDB = (score, playerName, gameSetting) => {
+
+
         if (!gameSetting || !playerName) {
             console.error("Invalid gameSetting or playerName.");
             return;
         }
 
-        const request = indexedDB.open('highScores', version);
+        let request = indexedDB.open("highScores", version);
 
-        request.onerror = function (event) {
-            console.error('Database error:', event.target.error);
-        }
-
-        request.onupgradeneeded = function (event) {
-            console.log("Upgrading database:", event.target.result);
-            console.log("Version:", version);
-            console.log("Game Setting:", gameSetting);
-
-
+        request.onupgradeneeded = function(event) {
             let db = event.target.result;
-            // Create an object store for high scores if it doesn't exist
+
+            // Create the object store if it doesn't exist
             if (!db.objectStoreNames.contains(gameSetting)) {
-                const objectStore = db.createObjectStore(gameSetting, { keyPath: 'playerName' });
-                objectStore.createIndex('playerName', 'playerName', { unique: true });
-                version++;
+                db.createObjectStore(gameSetting, { keyPath: "playerName" });
+                console.log("Object store created.");
             }
-        }
+        };
 
-        request.onsuccess = function (event) {
-
-            console.log("Database opened successfully:", event.target.result);
-
-            version = 1 + event.target.result.version;
-
-            // Open the database and transaction
+        request.onsuccess = function(event) {
             let db = event.target.result;
-            const transaction = db.transaction(gameSetting, 'readwrite');
-            const objectStore = transaction.objectStore(gameSetting);
 
-            const getRequest = objectStore.get(playerName);
+            // Check if the object store exists
+            if (db.objectStoreNames.contains(gameSetting)) {
+                let transaction = db.transaction(gameSetting, "readwrite");
+                let store = transaction.objectStore(gameSetting);
 
+                // Update an existing record
+                let updateRequest = store.put({ playerName: playerName, score: score });
+                updateRequest.onsuccess = function() {
+                    console.log("Record updated successfully.");
+                };
+                updateRequest.onerror = function() {
+                    console.error("Error updating record.");
+                };
+            } else {
+                // Create the object store and write to it
+                let version = db.version + 1;
+                localStorage.setItem("version", version); // Store the new version in localStorage
 
-            getRequest.onsuccess = function () {
-                const existingHighScore = getRequest.result;
-                if (existingHighScore) {
+                db.close();
+                let upgradeRequest = indexedDB.open("highScores", version);
 
-                    console.log("Updating record:", existingHighScore);
+                upgradeRequest.onupgradeneeded = function(event) {
+                    let upgradedDb = event.target.result;
+                    let store = upgradedDb.createObjectStore(gameSetting, { keyPath: "playerName" });
+                    store.add({ playerName: playerName, score: score });
+                    console.log("Object store created and record added.");
+                };
 
-                    // Update the score if the new score is higher
-                    if (score > existingHighScore.score) {
-                        existingHighScore.score = score;
-                    }
+                upgradeRequest.onsuccess = function() {
+                    console.log("Database upgraded successfully.");
+                };
+                upgradeRequest.onerror = function() {
+                    console.error("Error upgrading database.");
+                };
+            }
+        };
 
-                    const updateRequest = objectStore.put(existingHighScore);
-
-                    updateRequest.onsuccess = function () {
-                        console.log("Record updated successfully:", existingHighScore);
-                    };
-
-                    updateRequest.onerror = function (event) {
-                        console.error('Error updating record:', event.target.error);
-                    };
-
-                } else {
-
-                    // Add a new record if it doesn't exist
-                    console.log("Adding Record:", playerName);
-                    const newHighScore = { playerName: playerName, score: score };
-                    const addRequest = objectStore.add(newHighScore);
-
-                    addRequest.onsuccess = function () {
-                        console.log("Record added successfully:", newHighScore);
-                    };
-
-                    // Handle error for adding record
-                    addRequest.onerror = function (event) {
-                        console.error('Error adding record:', event.target.error);
-                    };
-                }
-
-            };
-
-
-            getRequest.onerror = function (event) {
-                console.error('Error retrieving record:', event.target.error);
-            };
+        request.onerror = function(event) {
+            console.error("Error opening database:", event.target.error);
         };
 
     };
@@ -773,6 +750,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const objectStore = transaction.objectStore('users');
 
             const getRequest = objectStore.get(playerName);
+
             getRequest.onsuccess = function (event) {
                 if (getRequest.result) {
                     console.log("User already exists:", event.target.result);
@@ -807,7 +785,14 @@ document.addEventListener("DOMContentLoaded", () => {
         resetSounds(); //added as test but doesn't affect function
 		
         if (playerAnswer == correctAnswer) {
+
+            answerInput.value = "";
+
+            tickSound.pause();
+            tickSound.currentTime = 0;
+
 			correctSound.play();
+           
             score += 1;
             timeScore += parseInt(timerElement.innerText);
 
@@ -820,16 +805,18 @@ document.addEventListener("DOMContentLoaded", () => {
 		} else {
             tickSound.pause();
             tickSound.currentTime = 0;
+
 			wrongSound.play();
             resetSounds();
 
             if(currentDifficulty == "Guru") {
 				endGame();
 			} else {
+
 				if(questionCount == 10) {
 					endGame();
 				}
-				
+
                 generateQuestion(gameSetting);
 				startTimer();
 			}
@@ -840,13 +827,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Try Again
     tryAgainButton.addEventListener("click", () => {
-		stopFireworks();
         clickSound.play();
-		score = 0;
+		stopFireworks();
+
+        finalScore = 0;
+        multiplier = 1;
 		questionCount = 0;
+		score = 0;
+        scoreMultiplier = 1;
+
 		endGameScreen.classList.add("hidden");
-        leaderboard.classList.add("hidden");
         highScoreMessage.classList.add("hidden");
+        leaderboard.classList.add("hidden");
+
+        sessionStorage.removeItem("correctAnswer");
+
         startGame(gameSetting);
     });
 
