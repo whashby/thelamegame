@@ -849,5 +849,32 @@ document.addEventListener("DOMContentLoaded", () => {
         highScoreMessage.classList.add("hidden");
         startGame(gameSetting);
     });
+
+
+
+
+
+
+
+
+
+
+    
+    const fs = require("fs");
+
+    const writeToFile = (filePath, data) => {
+        fs.writeFile(filePath, data, (err) => {
+            if (err) {
+                console.error("Error writing to file:", err);
+            } else {
+                console.log("File written successfully!");
+            }
+        });
+    };
+
+    // Example: Writing to "example.txt"
+    const data = "This is the data to be written to the file.";
+    writeToFile("example.txt", data);
+
     
 });
