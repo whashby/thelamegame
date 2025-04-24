@@ -73,7 +73,7 @@
 
 
     <!-- Story Mode -->
-    <div id="storyModeScreen" class="hidden">
+    <div id="storyGameScreen" class="hidden">
         <h2>Neural Nexus: The Mind Maze</h2>
         <p id="storyText">
             <span id="player"></span>, you're a cyber-hacker who has been trapped inside a rogue AI's digital domain — a labyrinth of neural networks where reality bends. The AI, named Spectra, challenges you to beat its mind games to escape.
@@ -81,21 +81,19 @@
         </p>
         <button id="assimilateBtn">Assimilate</button>
         <button id="escapeBtn">Escape!</button>
-    </div>
-
-    <div id="storyGameScreen" class="hidden">
-        <h2>Neural Nexus: The Mind Maze</h2>
-        <h1 id="levelTitle">Level 1: Prime Decryption</h1>
-        <p id="levelDescription">Decode the primes hidden in the sequence to proceed.</p>
-        <div id="questionContainer">
+        <h1 id="levelTitle" class="hidden">Level 1: Prime Decryption</h1>
+        <p id="levelDialogue" class="hidden">Welcome to the Threshold Layer. Here, intelligence dances with simplicity - but don't be deceived. Decode the numbers, hacker. Find the primes hidden in the sequence. Only the worthy pass through these gates.</p>
+        <p id="levelDescription" class="hidden">Decode the primes hidden in the sequence to proceed.</p>
+        <div id="questionContainer" class="hidden">
             <p id="question"></p>
             <input type="text" id="playerAnswer" placeholder="Your answer">
             <button id="submitBtn">Submit</button>
         </div>
-        <p id="feedback"></p>
-        <button id="nextLevelBtn" style="display: none;">Next Level</button>
-    </div>
+        <p id="feedback" class="hidden"></p>
+        <button id="nextLevelBtn" class="hidden">Next Level</button>
+        <button id="quitNexusBtn" class="hidden">Start Over</button>
 
+    </div>
 
 
 
@@ -129,7 +127,7 @@
         <div id="highScoreMessage" class="hidden"><h1>New High Score!</h1></div>
         <button id="tryAgainBtn">Try Again</button>
         <button class="chooseModeBtn">Choose Mode</button>
-        <button id="quitGameBtn">Quit</button>
+        <button id="quitGameBtn" class="hidden">Quit</button>
         <!-- Leaderboard -->
         <div id="leaderboard" class="hidden">
             <h2>Leaderboard</h2>
