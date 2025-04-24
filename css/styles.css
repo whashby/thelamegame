@@ -166,6 +166,12 @@ input {
     text-align: justify;
     max-width: 1024px;
     margin: 5% auto;
+    padding: 0 20px;
+}
+
+#submitBtn {
+    text-align: center;
+    margin: 10px auto;
 }
 
 #gameScreen button {
