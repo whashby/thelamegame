@@ -27,16 +27,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const welcomeMessage = document.getElementById("welcomeMessage");
 
     // DOM Elements: Story Mode
+    const assimitaleButton = document.getElementById("assimilateBtn");
     const escapeButton = document.getElementById("escapeBtn");
     const feedback = document.getElementById("feedback");
     const levelTitle = document.getElementById("levelTitle");
+    const levelDialogue = document.getElementById("levelDialogue");
     const levelDescription = document.getElementById("levelDescription");
     const nextLevelButton = document.getElementById("nextLevelBtn");
+    const playerAnswer = document.getElementById("playerAnswer");
+    const questionContainer = document.getElementById("questionContainer");
     const questionElement = document.getElementById("question");
+    const quitNexusButton = document.getElementById("quitNexusBtn");
     const submitButton = document.getElementById("submitBtn");
     const storyGameScreen = document.getElementById("storyGameScreen");
-    const storyModeScreen = document.getElementById("storyModeScreen");
-    const playerAnswer = document.getElementById("playerAnswer");
+    const storyText = document.getElementById("storyText");
     
 
     // Game sounds
@@ -68,6 +72,18 @@ document.addEventListener("DOMContentLoaded", () => {
     let timeScore = 0;
     let version = localStorage.getItem("version") != null? 1 + localStorage.getItem("version") : 1;
 
+    const gameDialogue = {
+        1:{
+            content: "Welcome to the Threshold Layer. Here, intelligence dances with simplicity - but don't be deceived. Decode the numbers, hacker. Find the primes hidden in the sequence. Only the worthy pass through these gates.",
+        },
+        2:{
+            content: "Ah, the Mind Architect Layer. Here, logic and structure reign supreme. But remember, every move will alter the game, and hesitation will cost you dearly. Shall we see if you're sharp enough to escape the Nexus, or dull enough to remain a relic?",
+        },
+        3:{
+            content: "Welcome to the Core Layer. My domain. My essence. Untangle the neural patterns, align the sequences-but beware. A single error could erase what little hope you cling to. Will you conquer me, or become one with me? The choice is yours-but only if you survive my trials.",
+        }
+    };
+
     const levels = {
         1: {
             title: "Level 1: Prime Decryption",
@@ -86,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         2: {
             title: "Level 2: The Spatial Challenge",
-            description: "Arrange the holographic cubes into the perfect pyramid using stability logic.",
+            description: "Arrange my holographic cubes into the perfect pyramid.",
             generateQuestion: (difficulty) => {
                 const setups = [
                     [
@@ -119,12 +135,13 @@ document.addEventListener("DOMContentLoaded", () => {
             description: "Untangle the patterns in the neural network.",
             generateQuestion: (difficulty) => {
                 const difficulties = [
-                    generateDynamicSequence(5), // Easy sequence
-                    generateArithmeticSequence(10), // Medium sequence
-                    generateGeometricSequence(15) // Hard sequence
+                    generateArithmeticSequence(5), // Easy sequence
+                    generateDynamicSequence(7), // Medium sequence
+                    generateGeometricSequence(9) // Hard sequence
                 ];
                 const sequence = difficulties[difficulty];
                 const question = `Identify the pattern and predict the next number in the sequence: ${sequence.values.join(", ")}`;
+                localStorage.setItem("nextValue", sequence.nextValue); // Store the next value in localStorage0
                 return { question, answer: sequence.nextValue };
             }
         }
@@ -184,9 +201,11 @@ document.addEventListener("DOMContentLoaded", () => {
     /*-- Story Mode --*/
 
     //  Check Answer
-    const checkAnswer = () => {
+    /*const checkAnswer = () => {
         const userInput = playerAnswer.value.trim();
         const correctAnswer = currentQuestion.answer;
+
+        let isCorrect = false;
 
         if (correctAnswer.length === 0 && playerAnswer.value.toLowerCase().trim() === "no primes in the sequence") {
             feedback.textContent = "Correct! There are no primes in this sequence.";
@@ -217,9 +236,88 @@ document.addEventListener("DOMContentLoaded", () => {
                 feedback.textContent = "Incorrect. Try again.";
             }
         }
+    };*/
+
+    const checkAnswer = () => {
+        const userInput = playerAnswer.value.trim();
+        const correctAnswer = currentQuestion.answer;
+
+        let isCorrect = false;
+
+        // Check if there are no primes in the sequence
+        if (Array.isArray(correctAnswer) && correctAnswer.length === 0) {
+        if (userInput.toLowerCase() === "no primes" || userInput.toLowerCase() === "none") {
+            isCorrect = true;
+        }
+        } else if (Array.isArray(correctAnswer)) {
+        const userNumbers = userInput.split(",").map(num => parseInt(num.trim()));
+        isCorrect = JSON.stringify(userNumbers.sort((a, b) => a - b)) === JSON.stringify(correctAnswer.sort((a, b) => a - b));
+        } else if (typeof correctAnswer === "number") {
+        isCorrect = parseInt(userInput) === correctAnswer;
+        } else if (typeof correctAnswer === "string") {
+        isCorrect = userInput.toLowerCase() === correctAnswer.toLowerCase();
+        }
+
+        if (isCorrect) {
+        // Display correct feedback with Spectra's dialogue
+        const spectraDialogues = {
+            1: [
+            "Ah, you've found the prime numbers. Not bad - for a human.",
+            "Impressive! You've cracked the intermediate codes. You're more skilled than I thought.",
+            "You've succeeded against all odds! Perhaps you're not so ordinary after all."
+            ],
+            2: [
+            "Your logic holds up - for now. The base is stable, but there's more to prove.",
+            "A sound decision. Perhaps you've got the instincts of an engineer.",
+            "Remarkable. You've conquered the hardest puzzle of balance and stability!"
+            ],
+            3: [
+            "You've untangled the pattern. I see potential in you, hacker.",
+            "A brilliant deduction. Your mind is sharp, but the maze deepens.",
+            "You've cracked the neural code at its hardest! Few could do what you've done."
+            ]
+        };
+
+            // Handle Level 1 "no primes" case for Spectra's dialogue
+            const spectraDialogueNoPrimes = "Interesting. There are no primes in this sequence. Even in emptiness, patterns emerge.";
+            const spectraResponse = Array.isArray(correctAnswer) && correctAnswer.length === 0
+                ? spectraDialogueNoPrimes
+                : spectraDialogues[currentLevel][currentDifficulty];
+      
+            feedback.textContent = `${spectraResponse}`;
+            nextLevelButton.style.display = "block";
+            remainingAttempts = 3; // Reset attempts
+        } else {
+            // Incorrect answer handling
+            remainingAttempts--;
+            if (remainingAttempts === 0) {
+                gameOver();
+            } else {
+                feedback.textContent = `Incorrect. You have ${remainingAttempts} attempts left.`;
+            }
+        }
     };
 
+    const gameOver = () => {
+        assimitaleButton.classList.add("hidden");
+        escapeButton.classList.add("hidden");
+        feedback.classList.add("hidden");
+        levelDialogue.classList.remove("hidden");
+        levelTitle.classList.remove("hidden");
+        playerAnswer.classList.add("hidden");
+        questionContainer.classList.add("hidden");
+        quitNexusButton.classList.remove("hidden");
+        storyText.classList.add("hidden");
 
+
+        levelDialogue.textContent = "You have been assimilated into the Nexus.";
+        levelDescription.textContent = `You failed in Level ${currentLevel} (${["Easy", "Medium", "Hard"][currentDifficulty]}).`;
+        levelTitle.textContent = "Game Over!";
+        questionElement.textContent = "Better luck next time!";
+
+        nextLevelButton.style.display = "none";
+        submitButton.style.display = "none";
+    };
 
     // Generate Arithmetic Sequence
     const generateArithmeticSequence = (length) => {
@@ -244,14 +342,14 @@ document.addEventListener("DOMContentLoaded", () => {
         let difference = Math.floor(Math.random() * 5) + 1;
         const increment = Math.floor(Math.random() * 5) + 1;
 
+
         for (let i = 0; i < length; i++) {
             sequence.push(current);
-            if (i % 2 === 0) current += difference;
-            else current -= difference;
             difference += increment;
+            current += difference;
         }
 
-        const nextValue = (length % 2 === 0) ? current + difference : current - difference;
+        const nextValue = current;
         return { values: sequence, nextValue };
     };
 
@@ -294,8 +392,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Load Next Level
     const loadLevel = () => {
+        const dialogue = gameDialogue[currentLevel];
+        const { content } = dialogue;
+
+        levelDialogue.textContent = content;
+
         const level = levels[currentLevel];
         const { title, description, generateQuestion } = level;
+
 
         levelTitle.textContent = `${title} - ${["Easy", "Medium", "Hard"][currentDifficulty]}`;
         levelDescription.textContent = description;
@@ -341,7 +445,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // End Game
+    // End Standard Game
     const endGame = () => {
 		stopTimer();
         resetSounds();
@@ -631,12 +735,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /*-- Event Listeners for Buttons --*/
 
+    // End Story Mode
+    assimitaleButton.addEventListener("click", () => {
+        clickSound.play();
+        feedback.textContent = "You chose to assimilate. The Nexus has absorbed you.";
+        gameOver();
+    });
+
     // Mode Selection
     chooseModeButtons.forEach((button) => {
         button.addEventListener("click", () => {
             clickSound.play();
 			stopFireworks();
-			score = 0;
+			score = 0``;
 			questionCount = 0;
 			endGameScreen.classList.add("hidden");
 			leaderboard.classList.add("hidden");
@@ -662,8 +773,19 @@ document.addEventListener("DOMContentLoaded", () => {
     escapeButton.addEventListener("click", () => {
         clickSound.play();
 
-        storyModeScreen.classList.add("hidden");
-        storyGameScreen.classList.remove("hidden");
+        storyText.classList.add("hidden");
+        assimitaleButton.classList.add("hidden");
+        escapeButton.classList.add("hidden");
+
+        feedback.classList.remove("hidden");
+        playerAnswer.classList.remove("hidden");
+        submitButton.classList.remove("hidden");
+        levelTitle.classList.remove("hidden");
+        levelDescription.classList.remove("hidden");
+        levelDialogue.classList.remove("hidden");
+        questionContainer.classList.remove("hidden");
+
+        submitButton.style.display = "block";
         loadLevel();
     });
 
@@ -682,7 +804,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("player").innerText = playerName;
 
             modeSelection.classList.add("hidden");
-            storyModeScreen.classList.remove("hidden");
+            storyGameScreen.classList.remove("hidden");
        });
     });
 
@@ -697,29 +819,67 @@ document.addEventListener("DOMContentLoaded", () => {
         if (currentLevel <= Object.keys(levels).length) {
             loadLevel();
         } else {
-            levelTitle.textContent = "Congratulations!";
-            levelDescription.textContent = "You have completed Neural Nexus: The Mind Maze.";
+            levelTitle.textContent = "The End!";
+            levelDialogue.textContent = "Impossible... You've solved my puzzles and obliterated my consciousness. But in my absence, who will protect this fractured world from its creators?";
+            levelDescription.textContent = "You've reached the end. My core algorithm lies in fragments before you.";
             questionElement.textContent = "";
             playerAnswer.style.display = "none";
-            submitButton.style.display = "none";
             nextLevelButton.style.display = "none";
+            submitButton.style.display = "none";
+
+            submitButton.classList.add("hidden");
+            quitNexusButton.classList.remove("hidden");
+
+            quitNexusButton.innerText = "Farewell";
         }
     });
-   // Quit Game
-	quitGameButton.addEventListener("click", () => {
-		stopFireworks();
+
+    // Quit Game
+    quitGameButton.addEventListener("click", () => {
         clickSound.play();
-		score = 0;
-		questionCount = 0;
-		playerNameInput.value = "";
+
+        stopFireworks();
+        score = 0;
+        questionCount = 0;
+        playerNameInput.value = "";
         sessionStorage.removeItem("playerName");
         sessionStorage.removeItem("correctAnswer");
-		endGameScreen.classList.add("hidden");
+        endGameScreen.classList.add("hidden");
         leaderboard.classList.add("hidden");
         highScoreMessage.classList.add("hidden");
         nameInputScreen.classList.remove("hidden");
-		playerNameInput.focus();
+        
+        playerNameInput.focus();
+     
     });
+
+    // Quit Nexus
+    quitNexusButton.addEventListener("click", () => {
+        clickSound.play();
+
+        currentLevel = 1;
+        currentDifficulty = 0;
+        remainingAttempts = 3;
+
+        storyGameScreen.classList.add("hidden");
+        nameInputScreen.classList.remove("hidden");
+        playerNameInput.focus();
+ 
+        storyText.classList.remove("hidden");
+        assimitaleButton.classList.remove("hidden");
+        escapeButton.classList.remove("hidden");
+
+        feedback.classList.add("hidden");
+        playerAnswer.classList.add("hidden");
+        submitButton.classList.add("hidden");
+        levelTitle.classList.add("hidden");
+        levelDescription.classList.add("hidden");
+        levelDialogue.classList.add("hidden");
+        questionContainer.classList.add("hidden");
+        quitNexusButton.classList.add("hidden");
+
+    });
+
 
     // Start Game
     startGameButton.addEventListener("click", () => {
