@@ -1055,6 +1055,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const fileData = await response.json();
             const content = atob(fileData.content);
             const parsedContent = JSON.parse(content);
+
             
             if (data === "highScores") {
                 highScores = parsedContent.highScores;
