@@ -1044,11 +1044,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
 
         try {
-            const response = await fetch(url, {
-                headers: {
-                    "Authorization": `token ${token}`,
-                }
-            });
+            const response = await fetch(url);
 
             if (!response.ok) {
 
@@ -1100,7 +1096,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
-                    "Authorization": `token ${token}`,
                     "Accept": "application/vnd.github.v3+json"
                 }
             });
@@ -1122,7 +1117,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "DELETE",
                 headers: {
-                    "Authorization": `token ${token}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
