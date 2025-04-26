@@ -980,7 +980,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Save Data to GitHub
     async function setData (filename) {
 
-        const token = "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"
         const owner = "whashby";
         const repo = "thelamegame";
         const path = filename;
@@ -1039,7 +1038,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fetch Data from GitHub
     async function getData (filename, data) {
-        const token = "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"
         const owner = "whashby";
         const repo = "thelamegame";
         const path = filename;
@@ -1089,7 +1087,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Delete Data from GitHub
     async function deleteData(filename) {
-        const token = "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"
         const owner = "whashby";
         const repo = "thelamegame";
         const path = filename;
