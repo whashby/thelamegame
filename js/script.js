@@ -62,6 +62,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let playerName;
     let timer;
 
+ //   setData("db.json", "version");
+ //   getData("db.json", "version");
+
     let currentLevel = 1;
     let currentDifficulty = 0; // Track difficulty (0: easy, 1: medium, 2: hard)
     let finalScore = 0;
@@ -147,11 +150,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    const gameOperations = ["Addition", "Subtraction", "Multiplication", "Division"]; //used later on in lazy logic just to reduce code to differentiate between standard and story modes. :D
 
-    let gameOperations = ["Addition", "Subtraction", "Multiplication", "Division"]; //used later on in lazy logic just to reduce code to differentiate between standard and story modes. :D
-    let highScores = JSON.parse(localStorage.getItem("highScores")) || {};
-
-     // Generate Next Game Question
+    getData("db.json", "highScores")
+    // Generate Next Game Question
     const generateQuestion = (gameSetting) => {
         resetSounds();
 
@@ -159,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
         answerInput.value = "";
         answerInput.focus();
 
-        let range = 10;
         if (gameSetting.includes("Guru")) {
             range += Math.floor(questionCount / 10) * 10;
         }
@@ -199,44 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     /*-- Story Mode --*/
-
-    //  Check Answer
-    /*const checkAnswer = () => {
-        const userInput = playerAnswer.value.trim();
-        const correctAnswer = currentQuestion.answer;
-
-        let isCorrect = false;
-
-        if (correctAnswer.length === 0 && playerAnswer.value.toLowerCase().trim() === "no primes in the sequence") {
-            feedback.textContent = "Correct! There are no primes in this sequence.";
-            nextLevelButton.style.display = "block";
-        } else if (Array.isArray(correctAnswer)) {
-            const userNumbers = userInput.split(",").map(num => parseInt(num.trim()));
-            if (
-                JSON.stringify(userNumbers.sort((a, b) => a - b)) ===
-                JSON.stringify(correctAnswer.sort((a, b) => a - b))
-            ) {
-                feedback.textContent = currentDifficulty === 0? "Correct! Well done.":'';
-                nextLevelButton.style.display = "block";
-            } else {
-                feedback.textContent = "Incorrect. Try again.";
-            }
-        } else if (typeof correctAnswer === "number") {
-            if (parseInt(userInput) === correctAnswer) {
-                feedback.textContent = "Correct! Well done.";
-                nextLevelButton.style.display = "block";
-            } else {
-                feedback.textContent = "Incorrect. Try again.";
-            }
-        } else if (typeof correctAnswer === "string") {
-            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
-                feedback.textContent = "Correct! Well done.";
-                nextLevelButton.style.display = "block";
-            } else {
-                feedback.textContent = "Incorrect. Try again.";
-            }
-        }
-    };*/
 
     const checkAnswer = () => {
         const userInput = playerAnswer.value.trim();
@@ -459,12 +422,13 @@ document.addEventListener("DOMContentLoaded", () => {
         timeBonus.innerText = timeScore;
         totalScore.innerText = finalScore;
         leaderboard.classList.remove("hidden");
-
+        quitGameButton.classList.remove("hidden");
 
 
         updateHighScoresDB(finalScore, playerName, gameSetting);
         checkHighScore();
         updateLeaderboard();
+        setData("db.json");
     };
 	
      // Stop All Audio Playback
@@ -708,6 +672,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!highScores[gameSetting]) {
             highScores[gameSetting] = [];
         }
+        
+        getData("db.json", "highScores");
+
+        const highScores = JSON.parse(localStorage.getItem("highScores"));
 
         const modeScores = highScores[gameSetting];
         const playerIndex = modeScores.findIndex(entry => entry.name === playerName);
@@ -725,6 +693,7 @@ document.addEventListener("DOMContentLoaded", () => {
         highScores[gameSetting] = modeScores.slice(0, 10);
         localStorage.setItem("highScores", JSON.stringify(highScores));
         displayLeaderboard();
+        setData("db.json");
 
     };
 				
@@ -958,6 +927,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if(questionCount == 10 && currentDifficulty == "Classic") {
 				endGame();
+                resetSounds();
 			} else {
 				generateQuestion(gameSetting);
 				startTimer();
@@ -971,10 +941,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if(currentDifficulty == "Guru") {
 				endGame();
+                resetSounds();
 			} else {
 
 				if(questionCount == 10) {
 					endGame();
+                    resetSounds();
 				}
 
                 generateQuestion(gameSetting);
@@ -1004,5 +976,173 @@ document.addEventListener("DOMContentLoaded", () => {
 
         startGame(gameSetting);
     });
+
+    // Save Data to GitHub
+    async function setData (filename) {
+
+        const token = "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"
+        const owner = "whashby";
+        const repo = "thelamegame";
+        const path = filename;
+
+        const data = {
+            highScores: highScores,
+            users: users,
+            version: version
+        };
+
+        const content = btoa(JSON.stringify(data));
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
+
+        let sha;
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Accept": "application/vnd.github.v3+json",
+                }
+            });
+
+            if (response.ok) {
+                const existingFile = await response.json();
+                sha = existingFile.sha;
+            } 
+
+        } catch (error) {
+            console.log("Error fetching file:", error);
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: `Update ${path}`,
+                    content: content,
+                    sha: sha
+                })
+            });
+            if (response.ok) {
+                console.log("Version updated successfully.");
+            } else {
+                console.error("Error updating version:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error updating version:", error);
+        }
+
+    }
+
+    // Fetch Data from GitHub
+    async function getData (filename, data) {
+        const token = "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"
+        const owner = "whashby";
+        const repo = "thelamegame";
+        const path = filename;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    "Authorization": `token ${token}`,
+                }
+            });
+
+            if (!response.ok) {
+
+                console.error("Error fetching file:", response.statusText);
+                //return;
+            }
+
+            const fileData = await response.json();
+            const content = atob(fileData.content);
+            const parsedContent = JSON.parse(content);
+            
+            if (data === "highScores") {
+                highScores = parsedContent.highScores;
+                localStorage.setItem("highScores", JSON.stringify(highScores));
+                console.log(parsedContent.highScores);
+            }
+
+            if (data === "users") {
+                users = parsedContent.users;
+                localStorage.setItem("users", JSON.stringify(users));
+                console.log(parsedContent.users);
+            }
+
+            if (data === "version") {
+                version = parsedContent.version;
+                localStorage.setItem("version", version);
+                console.log(parsedContent.version);
+            }
+
+
+        } catch (error) {
+            console.error("Error fetching file:", error);
+            return;
+        }
+    }
+
+    // Delete Data from GitHub
+    async function deleteData(filename) {
+        const token = "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"
+        const owner = "whashby";
+        const repo = "thelamegame";
+        const path = filename;
+        const message = `Delete ${path} file`; // Commit message
+
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
+
+        // Fetch the file's SHA
+        let sha;
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Accept": "application/vnd.github.v3+json"
+                }
+            });
+
+            if (response.ok) {
+                const fileData = await response.json();
+                sha = fileData.sha; // Extract the file's SHA
+            } else {
+                console.error("Error fetching file:", response.statusText);
+                return;
+            }
+        } catch (error) {
+            console.error("Error fetching file:", error);
+            return;
+        }
+
+        // Delete the file
+        try {
+            const response = await fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: message,
+                    sha: sha // Include the file's SHA
+                })
+            });
+
+            if (response.ok) {
+                console.log("File deleted successfully!");
+            } else {
+                console.error("Error deleting file:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error deleting file:", error);
+        }
+    }
+
 
 });
