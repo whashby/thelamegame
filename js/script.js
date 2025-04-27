@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.getElementById("submitBtn");
     const storyGameScreen = document.getElementById("storyGameScreen");
     const storyText = document.getElementById("storyText");
-    
+
 
     // Game sounds
     const buzzerSound = new Audio("sounds/buzzer.mp3");
@@ -51,10 +51,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const tickSound = new Audio("sounds/tick.mp3");
     const wrongSound = new Audio("sounds/wrong.mp3");
 
+    const CLASS_HIDDEN = "hidden";
+    const EVENT_CLICK = "click";
+    const STORAGE_GAME_SETTING = "gameSetting";
+
+
     // Set initial volume and playback time
     fireworksSound.volume = 0.3;
     tickSound.currentTime = 1;
-   
+
     // Game state variables 
     let currentMode;
     let currentQuestion;
@@ -62,27 +67,35 @@ document.addEventListener("DOMContentLoaded", () => {
     let playerName;
     let timer;
 
- //   setData("db.json", "version");
- //   getData("db.json", "version");
 
     let currentLevel = 1;
     let currentDifficulty = 0; // Track difficulty (0: easy, 1: medium, 2: hard)
     let finalScore = 0;
+    let highScores = JSON.parse(localStorage.getItem("highScores")) || {};
     let score = 0;
     let scoreMultiplier = 1;
     let questionCount = 0;
     let range = 10;
     let timeScore = 0;
-    let version = localStorage.getItem("version") != null? 1 + localStorage.getItem("version") : 1;
+    let version = localStorage.getItem("version") != null ? localStorage.getItem("version") : 1;
+    version += 1;
+
+    try {
+        getData();
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+
+
 
     const gameDialogue = {
-        1:{
+        1: {
             content: "Welcome to the Threshold Layer. Here, intelligence dances with simplicity - but don't be deceived. Decode the numbers, hacker. Find the primes hidden in the sequence. Only the worthy pass through these gates.",
         },
-        2:{
+        2: {
             content: "Ah, the Mind Architect Layer. Here, logic and structure reign supreme. But remember, every move will alter the game, and hesitation will cost you dearly. Shall we see if you're sharp enough to escape the Nexus, or dull enough to remain a relic?",
         },
-        3:{
+        3: {
             content: "Welcome to the Core Layer. My domain. My essence. Untangle the neural patterns, align the sequences-but beware. A single error could erase what little hope you cling to. Will you conquer me, or become one with me? The choice is yours-but only if you survive my trials.",
         }
     };
@@ -152,7 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const gameOperations = ["Addition", "Subtraction", "Multiplication", "Division"]; //used later on in lazy logic just to reduce code to differentiate between standard and story modes. :D
 
-    getData("db.json", "highScores")
     // Generate Next Game Question
     const generateQuestion = (gameSetting) => {
         resetSounds();
@@ -194,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const correctAnswer = eval(`${num1} ${operator} ${num2}`);
 
-        questionArea.innerText = `${num1} ${operator} ${num2}`;
+        questionArea.textContent = `${num1} ${operator} ${num2}`;
         sessionStorage.setItem("correctAnswer", correctAnswer);
 
     };
@@ -209,44 +221,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Check if there are no primes in the sequence
         if (Array.isArray(correctAnswer) && correctAnswer.length === 0) {
-        if (userInput.toLowerCase() === "no primes" || userInput.toLowerCase() === "none") {
-            isCorrect = true;
-        }
+            if (userInput.toLowerCase() === "no primes" || userInput.toLowerCase() === "none") {
+                isCorrect = true;
+            }
         } else if (Array.isArray(correctAnswer)) {
-        const userNumbers = userInput.split(",").map(num => parseInt(num.trim()));
-        isCorrect = JSON.stringify(userNumbers.sort((a, b) => a - b)) === JSON.stringify(correctAnswer.sort((a, b) => a - b));
+            const userNumbers = userInput.split(",").map(num => parseInt(num.trim()));
+            isCorrect = JSON.stringify(userNumbers.sort((a, b) => a - b)) === JSON.stringify(correctAnswer.sort((a, b) => a - b));
         } else if (typeof correctAnswer === "number") {
-        isCorrect = parseInt(userInput) === correctAnswer;
+            isCorrect = parseInt(userInput) === correctAnswer;
         } else if (typeof correctAnswer === "string") {
-        isCorrect = userInput.toLowerCase() === correctAnswer.toLowerCase();
+            isCorrect = userInput.toLowerCase() === correctAnswer.toLowerCase();
         }
 
         if (isCorrect) {
-        // Display correct feedback with Spectra's dialogue
-        const spectraDialogues = {
-            1: [
-            "Ah, you've found the prime numbers. Not bad - for a human.",
-            "Impressive! You've cracked the intermediate codes. You're more skilled than I thought.",
-            "You've succeeded against all odds! Perhaps you're not so ordinary after all."
-            ],
-            2: [
-            "Your logic holds up - for now. The base is stable, but there's more to prove.",
-            "A sound decision. Perhaps you've got the instincts of an engineer.",
-            "Remarkable. You've conquered the hardest puzzle of balance and stability!"
-            ],
-            3: [
-            "You've untangled the pattern. I see potential in you, hacker.",
-            "A brilliant deduction. Your mind is sharp, but the maze deepens.",
-            "You've cracked the neural code at its hardest! Few could do what you've done."
-            ]
-        };
+            // Display correct feedback with Spectra's dialogue
+            const spectraDialogues = {
+                1: [
+                    "Ah, you've found the prime numbers. Not bad - for a human.",
+                    "Impressive! You've cracked the intermediate codes. You're more skilled than I thought.",
+                    "You've succeeded against all odds! Perhaps you're not so ordinary after all."
+                ],
+                2: [
+                    "Your logic holds up - for now. The base is stable, but there's more to prove.",
+                    "A sound decision. Perhaps you've got the instincts of an engineer.",
+                    "Remarkable. You've conquered the hardest puzzle of balance and stability!"
+                ],
+                3: [
+                    "You've untangled the pattern. I see potential in you, hacker.",
+                    "A brilliant deduction. Your mind is sharp, but the maze deepens.",
+                    "You've cracked the neural code at its hardest! Few could do what you've done."
+                ]
+            };
 
             // Handle Level 1 "no primes" case for Spectra's dialogue
             const spectraDialogueNoPrimes = "Interesting. There are no primes in this sequence. Even in emptiness, patterns emerge.";
             const spectraResponse = Array.isArray(correctAnswer) && correctAnswer.length === 0
                 ? spectraDialogueNoPrimes
                 : spectraDialogues[currentLevel][currentDifficulty];
-      
+
             feedback.textContent = `${spectraResponse}`;
             nextLevelButton.style.display = "block";
             remainingAttempts = 3; // Reset attempts
@@ -262,24 +274,25 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const gameOver = () => {
-        assimitaleButton.classList.add("hidden");
-        escapeButton.classList.add("hidden");
-        feedback.classList.add("hidden");
-        levelDialogue.classList.remove("hidden");
-        levelTitle.classList.remove("hidden");
-        playerAnswer.classList.add("hidden");
-        questionContainer.classList.add("hidden");
-        quitNexusButton.classList.remove("hidden");
-        storyText.classList.add("hidden");
-
+        updateElementVisibility(assimilateButton, false);//
+        updateElementVisibility(escapeButton, false);//
+        updateElementVisibility(feedback, false);//
+        updateElementVisibility(levelDialogue, true);//
+        updateElementVisibility(levelDescription, true);//
+        updateElementVisibility(levelTitle, true);//
+        updateElementVisibility(nextLevelButton, false);//
+        updateElementVisibility(playerAnswer, false);//
+        updateElementVisibility(questionArea, false);
+        updateElementVisibility(questionContainer, false);//
+        updateElementVisibility(quitGameButton, false);
+        updateElementVisibility(quitNexusButton, true);//
+        updateElementVisibility(storyText, false);//
+        updateElementVisibility(submitButton, false);//
 
         levelDialogue.textContent = "You have been assimilated into the Nexus.";
         levelDescription.textContent = `You failed in Level ${currentLevel} (${["Easy", "Medium", "Hard"][currentDifficulty]}).`;
         levelTitle.textContent = "Game Over!";
         questionElement.textContent = "Better luck next time!";
-
-        nextLevelButton.style.display = "none";
-        submitButton.style.display = "none";
     };
 
     // Generate Arithmetic Sequence
@@ -375,63 +388,89 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
- 
 
-   /*-- Standard Game Mode --*/
 
-	// Check Highscore
-    const checkHighScore = () => {
+    /*-- Standard Game Mode --*/
+
+    // Check Highscore
+    const checkHighScore = (finalScore) => {
+
+
+        if (localStorage.getItem(highScores)) {
+            highScores = JSON.parse(localStorage.getItem("highScores"));
+        } else {
+            highScores = {};
+        }
+
+        const gameSetting = sessionStorage.getItem(STORAGE_GAME_SETTING);
+
         if (highScores[gameSetting]) {
             const gameHighScores = highScores[gameSetting];
             const highestScore = gameHighScores[0].score;
 
-            if (score > highestScore) {
-                highScoreMessage.classList.remove("hidden");
+            setData();
+
+            if (finalScore > highestScore) {
+                updateElementVisibility(highScoreMessage, false);
                 triggerFireworks();
             }
         } else {
-            if (score > 0) {
-                highScoreMessage.classList.remove("hidden");
+            if (finalScore > 0) {
+                updateElementVisibility(highScoreMessage, false);
                 triggerFireworks();
             }
         }
     };
 
     // Display Leaderboard
-    const displayLeaderboard = () => {
+    const displayLeaderboard = (highScores) => {
+
+        const gameSetting = sessionStorage.getItem(STORAGE_GAME_SETTING);
+        const playerName = sessionStorage.getItem("playerName");
+
+
         leaderboardList.innerHTML = "";
         highScores[gameSetting].forEach((entry, index) => {
             const li = document.createElement("li");
-            li.innerHTML = `${index + 1}. ${entry.name}: ` + '<span class="score">' + `${entry.score}</span>`;
-            if (entry.name === playerName) li.style.fontWeight = "bold"; // Highlight top score
+            li.innerHTML = `${index + 1}. ${entry.playerName}: ` + '<span class="score">' + `${entry.score}</span>`;
+            if (entry.playerName === playerName) li.style.fontWeight = "bold"; // Highlight top score
             leaderboardList.appendChild(li);
         });
     };
 
+    const updateElementVisibility = (element, isVisible) => {
+        element.classList.toggle(CLASS_HIDDEN, !isVisible);
+    };
+
+    const updateElementClass = (element, className) => {
+        element.classList.toggle(className);
+    };
+
     // End Standard Game
     const endGame = () => {
-		stopTimer();
+        stopTimer();
         resetSounds();
 
         finalScore = (score * scoreMultiplier) + timeScore;
-       
-        standardGameScreen.classList.add("hidden");
-        endGameScreen.classList.remove("hidden");
-        playerScore.innerHTML = score;
-        multiplierBonus.innerText = scoreMultiplier;
-        timeBonus.innerText = timeScore;
-        totalScore.innerText = finalScore;
-        leaderboard.classList.remove("hidden");
-        quitGameButton.classList.remove("hidden");
 
+        updateElementVisibility(standardGameScreen, false);
+        updateElementVisibility(endGameScreen, true);
+        updateElementVisibility(leaderboard, true);
+        updateElementVisibility(quitGameButton, true);
+
+        playerScore.innerHTML = score;
+        multiplierBonus.textContent = scoreMultiplier;
+        timeBonus.textContent = timeScore;
+        totalScore.textContent = finalScore;
 
         updateHighScoresDB(finalScore, playerName, gameSetting);
-        checkHighScore();
-        updateLeaderboard();
-        setData("db.json");
+        checkHighScore(finalScore);
+        updateLeaderboard(playerName, finalScore);
     };
-	
-     // Stop All Audio Playback
+
+
+
+    // Stop All Audio Playback
     const resetSounds = () => {
         if (buzzerSound.currentTime > 0) {
             buzzerSound.pause();
@@ -456,7 +495,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Start Game
     const startGame = (gameSetting) => {
-        standardGameScreen.classList.remove("hidden");
+        updateElementVisibility(standardGameScreen, true);
         generateQuestion(gameSetting);
         startTimer();
     };
@@ -464,11 +503,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Init Timer
     const startTimer = () => {
         let timeLeft = 10;
-        timerElement.innerText = timeLeft;
+        timerElement.textContent = timeLeft;
 
         timer = setInterval(() => {
             timeLeft--;
-            timerElement.innerText = timeLeft;
+            timerElement.textContent = timeLeft;
             tickSound.play();
 
             if (timeLeft <= 0) {
@@ -481,30 +520,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     };
 
-   // Stop Fireworks Animation
+    // Stop Fireworks Animation
     const stopFireworks = () => {
         if (fireworksSound.currentTime > 0) {
             fireworksSound.pause();
             fireworksSound.currentTime = 0;
         }
-        
-		// Stop the interval that creates random fireworks
-		const highestIntervalId = window.setInterval(() => {}, 0); // Get the highest interval ID
-		for (let i = 0; i <= highestIntervalId; i++) {
-			window.clearInterval(i); // Clear all intervals
-		}
 
-		// Cancel the animation frame loop
-		const highestAnimationFrameId = window.requestAnimationFrame(() => {});
-		for (let i = 0; i <= highestAnimationFrameId; i++) {
-			window.cancelAnimationFrame(i); // Cancel all animation frames
-		}
+        // Stop the interval that creates random fireworks
+        const highestIntervalId = window.setInterval(() => { }, 0); // Get the highest interval ID
+        for (let i = 0; i <= highestIntervalId; i++) {
+            window.clearInterval(i); // Clear all intervals
+        }
 
-		// Optionally, remove all remaining particles from the DOM
-		const particles = document.querySelectorAll('.particle');
-		particles.forEach(particle => particle.remove());
+        // Cancel the animation frame loop
+        const highestAnimationFrameId = window.requestAnimationFrame(() => { });
+        for (let i = 0; i <= highestAnimationFrameId; i++) {
+            window.cancelAnimationFrame(i); // Cancel all animation frames
+        }
+
+        // Optionally, remove all remaining particles from the DOM
+        const particles = document.querySelectorAll('.particle');
+        particles.forEach(particle => particle.remove());
     };
-    
+
     // Stop Timer
     const stopTimer = () => {
         if (timer) {
@@ -515,92 +554,100 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-   // Start Fireworks Animation
-	const triggerFireworks = () => {
-	
-        fireworks.classList.remove("hidden");
+
+    // Start Fireworks Animation
+    const triggerFireworks = () => {
+
+        updateElementVisibility(fireworks, true);
+        //fireworks.classList.remove("hidden");
         fireworksSound.play();
-		
-        
+
+
         // Particle constructor
-		function Particle(x, y, color) {
-			this.x = x;
-			this.y = y;
-			this.color = color;
-			this.element = document.createElement('div'); // Create a div for the particle
-            this.element.classList.add("particle");
-			this.lifespan = 100; // Particle lifespan
-			this.size = Math.random() * 10 + 5; // Particle size
-			this.velocityX = Math.random() * 10 - 5; // Horizontal velocity
-			this.velocityY = Math.random() * 10 - 5; // Vertical velocity
+        function Particle(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.element = document.createElement('div'); // Create a div for the particle
+            //this.element.classList.add("particle");
+            updateElementClass(this.element, "particle");
 
-			// Style the particle
-			this.element.style.backgroundColor = this.color;
-			this.element.style.borderRadius = '50%';
-			this.element.style.height = this.size + 'px';
-			this.element.style.left = x + 'px';
-			this.element.style.position = 'absolute';
-			this.element.style.top = y + 'px';
-			this.element.style.width = this.size + 'px';
+            this.lifespan = 100; // Particle lifespan
+            this.size = Math.random() * 10 + 5; // Particle size
+            this.velocityX = Math.random() * 10 - 5; // Horizontal velocity
+            this.velocityY = Math.random() * 10 - 5; // Vertical velocity
 
-			document.body.appendChild(this.element);
-		}
+            // Style the particle
+            this.element.style.backgroundColor = this.color;
+            this.element.style.borderRadius = '50%';
+            this.element.style.height = this.size + 'px';
+            this.element.style.left = x + 'px';
+            this.element.style.position = 'absolute';
+            this.element.style.top = y + 'px';
+            this.element.style.width = this.size + 'px';
 
-		// Update and render particle
-		Particle.prototype.update = function () {
-			this.x += this.velocityX;
-			this.y += this.velocityY;
-			this.lifespan -= 1;
-			this.velocityY += 0.1; // Simulate gravity
+            document.body.appendChild(this.element);
+        }
 
-			// Update position and opacity
-			this.element.style.left = this.x + 'px';
-			this.element.style.opacity = this.lifespan / 100;
-			this.element.style.top = this.y + 'px';
+        // Update and render particle
+        Particle.prototype.update = function () {
+            this.x += this.velocityX;
+            this.y += this.velocityY;
+            this.lifespan -= 1;
+            this.velocityY += 0.1; // Simulate gravity
 
-			// Remove particle when lifespan ends
-			if (this.lifespan <= 0) {
-				this.element.remove();
-			}
-		};
+            // Update position and opacity
+            this.element.style.left = this.x + 'px';
+            this.element.style.opacity = this.lifespan / 100;
+            this.element.style.top = this.y + 'px';
 
-		// Create fireworks at given coordinates
-		const createFirework = (x, y) => {
-			for (let i = 0; i < 50; i++) {
-				const color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
-				const particle = new Particle(x, y, color);
-				particles.push(particle);
-			}
-		};
-            
+            // Remove particle when lifespan ends
+            if (this.lifespan <= 0) {
+                this.element.remove();
+            }
+        };
 
-		// Animation loop
-		const particles = [];
-		const animate = () => {
-			particles.forEach((p, index) => {
-				p.update();
-				if (p.lifespan <= 0) {
-					particles.splice(index, 1); // Remove expired particles
-				}
-			});
-			requestAnimationFrame(animate);
-		};
+        // Create fireworks at given coordinates
+        const createFirework = (x, y) => {
+            for (let i = 0; i < 50; i++) {
+                const color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+                const particle = new Particle(x, y, color);
+                particles.push(particle);
+            }
+        };
 
-		// Automate fireworks
-		// Function to create a firework at a random position
-		const createRandomFirework = () => {
-			const x = Math.random() * window.innerWidth; // Random x-coordinate
-			const y = Math.random() * window.innerHeight / 2; // Random y-coordinate (upper half of canvas)
-			createFirework(x, y);
-		}
 
-		// Automate fireworks every 1 second
-		setInterval(createRandomFirework, 500); // Adjust the interval (1000ms = 1 second) as needed
-		animate();
-	};
+        // Animation loop
+        const particles = [];
+        const animate = () => {
+            particles.forEach((p, index) => {
+                p.update();
+                if (p.lifespan <= 0) {
+                    particles.splice(index, 1); // Remove expired particles
+                }
+            });
+            requestAnimationFrame(animate);
+        };
+
+        // Automate fireworks
+        // Function to create a firework at a random position
+        const createRandomFirework = () => {
+            const x = Math.random() * window.innerWidth; // Random x-coordinate
+            const y = Math.random() * window.innerHeight / 2; // Random y-coordinate (upper half of canvas)
+            createFirework(x, y);
+        }
+
+        // Automate fireworks every 1 second
+        setInterval(createRandomFirework, 500); // Adjust the interval (1000ms = 1 second) as needed
+        animate();
+    };
+
+
+
+
 
     // Open or create openHighScoresDB database
-    const updateHighScoresDB = (score, playerName, gameSetting) => {
+    const updateHighScoresDB = (finalScore, playerName, gameSetting) => {
 
 
         if (!gameSetting || !playerName) {
@@ -610,7 +657,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let request = indexedDB.open("highScores", version);
 
-        request.onupgradeneeded = function(event) {
+        request.onupgradeneeded = function (event) {
             let db = event.target.result;
 
             // Create the object store if it doesn't exist
@@ -620,7 +667,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         };
 
-        request.onsuccess = function(event) {
+        request.onsuccess = function (event) {
             let db = event.target.result;
 
             // Check if the object store exists
@@ -629,11 +676,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 let store = transaction.objectStore(gameSetting);
 
                 // Update an existing record
-                let updateRequest = store.put({ playerName: playerName, score: score });
-                updateRequest.onsuccess = function() {
+                let updateRequest = store.put({ playerName: playerName, score: finalScore });
+                updateRequest.onsuccess = function () {
                     console.log("Record updated successfully.");
                 };
-                updateRequest.onerror = function() {
+                updateRequest.onerror = function () {
                     console.error("Error updating record.");
                 };
             } else {
@@ -644,68 +691,77 @@ document.addEventListener("DOMContentLoaded", () => {
                 db.close();
                 let upgradeRequest = indexedDB.open("highScores", version);
 
-                upgradeRequest.onupgradeneeded = function(event) {
+                upgradeRequest.onupgradeneeded = function (event) {
                     let upgradedDb = event.target.result;
                     let store = upgradedDb.createObjectStore(gameSetting, { keyPath: "playerName" });
-                    store.add({ playerName: playerName, score: score });
+                    store.add({ playerName: playerName, score: finalScore });
                     console.log("Object store created and record added.");
                 };
 
-                upgradeRequest.onsuccess = function() {
+                upgradeRequest.onsuccess = function () {
                     console.log("Database upgraded successfully.");
                 };
-                upgradeRequest.onerror = function() {
+                upgradeRequest.onerror = function () {
                     console.error("Error upgrading database.");
                 };
             }
         };
 
-        request.onerror = function(event) {
+        request.onerror = function (event) {
             console.error("Error opening database:", event.target.error);
         };
 
     };
 
     // Update Leaderboard
-    const updateLeaderboard = () => {
+    const updateLeaderboard = (playerName, finalScore) => {
+
+        if (localStorage.getItem("highScores")) {
+            highScores = JSON.parse(localStorage.getItem("highScores"));
+        } else {
+            highScores = {};
+        }
+
+        const gameSetting = sessionStorage.getItem(STORAGE_GAME_SETTING);
+
+
         // Initialize if no high scores exist for the mode
         if (!highScores[gameSetting]) {
             highScores[gameSetting] = [];
         }
-        
-        getData("db.json", "highScores");
-
-        const highScores = JSON.parse(localStorage.getItem("highScores"));
 
         const modeScores = highScores[gameSetting];
-        const playerIndex = modeScores.findIndex(entry => entry.name === playerName);
+        console.log("Mode scores:", modeScores);
+        const playerIndex = modeScores.findIndex((entry) => entry.playerName === playerName);
 
-
+        console.log("Player found in leaderboard:", playerIndex);
         if (playerIndex !== -1) {
             if (finalScore > modeScores[playerIndex].score) {
                 modeScores[playerIndex].score = finalScore;
             }
         } else {
-            modeScores.push({ name: playerName, score: finalScore });
+            modeScores.push({ playerName: playerName, score: finalScore });
         }
+
 
         modeScores.sort((a, b) => b.score - a.score);
         highScores[gameSetting] = modeScores.slice(0, 10);
         localStorage.setItem("highScores", JSON.stringify(highScores));
-        displayLeaderboard();
-        setData("db.json");
+        console.log("High scores updated:", highScores);
+        displayLeaderboard(highScores);
+        setData();
 
     };
-				
+
     // Stop Fireworks Audio at End of Playback
-    fireworksSound.addEventListener("ended",() => {
+    fireworksSound.addEventListener("ended", () => {
         stopFireworks();
     });
 
     /*-- Event Listeners for Buttons --*/
 
     // End Story Mode
-    assimitaleButton.addEventListener("click", () => {
+    assimitaleButton.addEventListener(EVENT_CLICK, () => {
         clickSound.play();
         feedback.textContent = "You chose to assimilate. The Nexus has absorbed you.";
         gameOver();
@@ -713,33 +769,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Mode Selection
     chooseModeButtons.forEach((button) => {
-        button.addEventListener("click", () => {
+        button.addEventListener(EVENT_CLICK, () => {
             clickSound.play();
-			stopFireworks();
-			score = 0``;
-			questionCount = 0;
-			endGameScreen.classList.add("hidden");
-			leaderboard.classList.add("hidden");
-            highScoreMessage.classList.add("hidden");
-			difficultySelection.classList.add("hidden");
-			modeSelection.classList.remove("hidden");
+            stopFireworks();
+            score = 0``;
+            questionCount = 0;
+
+            updateElementVisibility(difficultySelection, false);
+            updateElementVisibility(endGameScreen, false);
+            updateElementVisibility(highScoreMessage, false);
+            updateElementVisibility(leaderboard, false);
+            updateElementVisibility(modeSelection, false);
         });
     });
 
     // Select Game Difficulty
     difficultyButtons.forEach((button) => {
-        button.addEventListener("click", (e) => {
+        button.addEventListener(EVENT_CLICK, (e) => {
             clickSound.play();
             currentDifficulty = e.target.dataset.difficulty;
-			gameSetting = currentMode+'-'+currentDifficulty;
-            sessionStorage.setItem("gameSetting", gameSetting)
-            difficultySelection.classList.add("hidden");
+            gameSetting = currentMode + '-' + currentDifficulty;
+            sessionStorage.setItem(STORAGE_GAME_SETTING, gameSetting)
+            updateElementVisibility(difficultySelection, false);
             startGame(gameSetting);
         });
     });
-	
+
     // continue Story Mode
-    escapeButton.addEventListener("click", () => {
+    escapeButton.addEventListener(EVENT_CLICK, () => {
         clickSound.play();
 
         storyText.classList.add("hidden");
@@ -760,25 +817,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Select Game Mode
     modeButtons.forEach(button => {
-        button.addEventListener("click", (e) => {
+        button.addEventListener(EVENT_CLICK, (e) => {
             clickSound.play();
             currentMode = e.target.dataset.operation;
 
             if (gameOperations.includes(currentMode)) {
-                modeSelection.classList.add("hidden");
-                difficultySelection.classList.remove("hidden");
+                updateElementVisibility(modeSelection, false);
+                updateElementVisibility(difficultySelection, true);
                 return;
             }
 
-            document.getElementById("player").innerText = playerName;
+            document.getElementById("player").textContent = `${playerName}`;
 
-            modeSelection.classList.add("hidden");
-            storyGameScreen.classList.remove("hidden");
-       });
+            updateElementVisibility(modeSelection, false);
+            updateElementVisibility(storyGameScreen, true);
+        });
     });
 
     // Go to Next Level
-    nextLevelButton.addEventListener("click", () => {
+    nextLevelButton.addEventListener(EVENT_CLICK, () => {
         currentDifficulty++;
         if (currentDifficulty > 2) {
             currentDifficulty = 0; // Reset difficulty
@@ -796,10 +853,10 @@ document.addEventListener("DOMContentLoaded", () => {
             nextLevelButton.style.display = "none";
             submitButton.style.display = "none";
 
-            submitButton.classList.add("hidden");
-            quitNexusButton.classList.remove("hidden");
+            updateElementVisibility(submitButton, false);
+            updateElementVisibility(quitNexusButton, true);
 
-            quitNexusButton.innerText = "Farewell";
+            quitNexusButton.textContent = "Leave Nexus";
         }
     });
 
@@ -817,9 +874,9 @@ document.addEventListener("DOMContentLoaded", () => {
         leaderboard.classList.add("hidden");
         highScoreMessage.classList.add("hidden");
         nameInputScreen.classList.remove("hidden");
-        
+
         playerNameInput.focus();
-     
+
     });
 
     // Quit Nexus
@@ -833,7 +890,7 @@ document.addEventListener("DOMContentLoaded", () => {
         storyGameScreen.classList.add("hidden");
         nameInputScreen.classList.remove("hidden");
         playerNameInput.focus();
- 
+
         storyText.classList.remove("hidden");
         assimitaleButton.classList.remove("hidden");
         escapeButton.classList.remove("hidden");
@@ -851,10 +908,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // Start Game
-    startGameButton.addEventListener("click", () => {
-		clickSound.play();
+    startGameButton.addEventListener(EVENT_CLICK, () => {
+        clickSound.play();
         playerName = playerNameInput.value.trim();
-        
+
         if (!playerName || !isNaN(playerName)) {
             alert("Please enter a valid name.");
             playerNameInput.focus();
@@ -877,16 +934,18 @@ document.addEventListener("DOMContentLoaded", () => {
             const db = event.target.result;
             const transaction = db.transaction('users', 'readwrite');
             const objectStore = transaction.objectStore('users');
+            users = objectStore.getAll();
+            users.onsuccess = function (event) {
+                users = event.target.result;
+            }
 
             const getRequest = objectStore.get(playerName);
 
             getRequest.onsuccess = function (event) {
                 if (getRequest.result) {
-                    console.log("User already exists:", event.target.result);
-                    welcomeMessage.innerText = `Welcome back, ${playerName}!`;
+                    welcomeMessage.textContent = `Welcome back, ${playerName}!`;
                 } else {
-                    console.log("User does not exist, adding:", playerName);
-                    welcomeMessage.innerText = `Welcome, ${playerName}!`;
+                    welcomeMessage.textContent = `Welcome, ${playerName}!`;
                     const user = { playerName: playerName };
                     objectStore.add(user);
                 }
@@ -900,19 +959,18 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         };
 
-
         nameInputScreen.classList.add("hidden");
         modeSelection.classList.remove("hidden");
     });
 
     // Validate Answer
-    submitAnswerButton.addEventListener("click", () => {
+    submitAnswerButton.addEventListener(EVENT_CLICK, () => {
         const playerAnswer = parseFloat(answerInput.value);
-		const correctAnswer = sessionStorage.getItem("correctAnswer");
+        const correctAnswer = sessionStorage.getItem("correctAnswer");
 
-		stopTimer();
+        stopTimer();
         resetSounds(); //added as test but doesn't affect function
-		
+
         if (playerAnswer == correctAnswer) {
 
             answerInput.value = "";
@@ -920,55 +978,56 @@ document.addEventListener("DOMContentLoaded", () => {
             tickSound.pause();
             tickSound.currentTime = 0;
 
-			correctSound.play();
-           
-            score += 1;
-            timeScore += parseInt(timerElement.innerText);
+            correctSound.play();
 
-            if(questionCount == 10 && currentDifficulty == "Classic") {
-				endGame();
+            score += 1;
+            timeScore += parseInt(timerElement.textContent);
+
+            if (questionCount == 10 && currentDifficulty == "Classic") {
+                endGame();
                 resetSounds();
-			} else {
-				generateQuestion(gameSetting);
-				startTimer();
-			}
-		} else {
+            } else {
+                generateQuestion(gameSetting);
+                startTimer();
+            }
+        } else {
             tickSound.pause();
             tickSound.currentTime = 0;
 
-			wrongSound.play();
+            wrongSound.play();
             resetSounds();
 
-            if(currentDifficulty == "Guru") {
-				endGame();
+            if (currentDifficulty == "Guru") {
+                endGame();
                 resetSounds();
-			} else {
+            } else {
 
-				if(questionCount == 10) {
-					endGame();
+                if (questionCount == 10) {
+                    endGame();
                     resetSounds();
-				}
+                }
 
                 generateQuestion(gameSetting);
-				startTimer();
-			}
-		}
+                startTimer();
+            }
+        }
     });
 
-    submitButton.addEventListener("click", checkAnswer);
+    submitButton.addEventListener(EVENT_CLICK, checkAnswer);
 
     // Try Again
-    tryAgainButton.addEventListener("click", () => {
+    tryAgainButton.addEventListener(EVENT_CLICK, () => {
         clickSound.play();
-		stopFireworks();
+        stopFireworks();
 
         finalScore = 0;
         multiplier = 1;
-		questionCount = 0;
-		score = 0;
+        questionCount = 0;
+        range = 10;
+        score = 0;
         scoreMultiplier = 1;
 
-		endGameScreen.classList.add("hidden");
+        endGameScreen.classList.add("hidden");
         highScoreMessage.classList.add("hidden");
         leaderboard.classList.add("hidden");
 
@@ -978,17 +1037,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Save Data to GitHub
-    async function setData (filename) {
+    async function setData() {
 
         const owner = "whashby";
         const repo = "thelamegame";
-        const path = filename;
+        const path = "db.json";
+        const token = window.env.TOKEN;
 
-        const data = {
-            highScores: highScores,
-            users: users,
-            version: version
-        };
+        const data = {};
+
+        if (localStorage.getItem("highScores")) {
+            data["highScores"] = localStorage.getItem("highScores");
+        }
+
+        if (localStorage.getItem("users")) {
+            data["users"] = localStorage.getItem("users");
+        }
+
+        if (localStorage.getItem("version")) {
+            data["version"] = localStorage.getItem("version");
+        }
+
+        console.log("Data to be saved:", data);
 
         const content = btoa(JSON.stringify(data));
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
@@ -1006,7 +1076,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (response.ok) {
                 const existingFile = await response.json();
                 sha = existingFile.sha;
-            } 
+            }
 
         } catch (error) {
             console.log("Error fetching file:", error);
@@ -1027,6 +1097,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             if (response.ok) {
                 console.log("Version updated successfully.");
+                localStorage.clear();
             } else {
                 console.error("Error updating version:", response.statusText);
             }
@@ -1037,44 +1108,63 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Fetch Data from GitHub
-    async function getData (filename, data) {
+    async function getData() {
+
+
         const owner = "whashby";
         const repo = "thelamegame";
-        const path = filename;
+        const path = "db.json";
+        const token = window.env.TOKEN;
+
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
 
         try {
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                headers: {
+                    "Authorization": `token ${token}`,
+                }
+            });
 
             if (!response.ok) {
 
                 console.error("Error fetching file:", response.statusText);
-                //return;
             }
 
             const fileData = await response.json();
             const content = atob(fileData.content);
             const parsedContent = JSON.parse(content);
 
-            
-            if (data === "highScores") {
-                highScores = parsedContent.highScores;
-                localStorage.setItem("highScores", JSON.stringify(highScores));
-                console.log(parsedContent.highScores);
+            const sha = fileData.sha;
+
+
+            if (parsedContent.highScores) {
+
+                const highScores = parsedContent.highScores;
+                localStorage.setItem("highScores", highScores);
+
+            } else {
+                localStorage.setItem("highScores", {});
+            }
+            console.log("highScores DB:", JSON.parse(localStorage.getItem("highScores")));
+
+            if (parsedContent.users) {
+
+                const users = parsedContent.users;
+                localStorage.setItem("users", users);
+
+            } else {
+                localStorage.setItem("users", "");
             }
 
-            if (data === "users") {
-                users = parsedContent.users;
-                localStorage.setItem("users", JSON.stringify(users));
-                console.log(parsedContent.users);
-            }
 
-            if (data === "version") {
-                version = parsedContent.version;
+            if (parsedContent.version) {
+
+                const version = parsedContent.version;
                 localStorage.setItem("version", version);
-                console.log(parsedContent.version);
-            }
 
+            } else {
+                localStorage.setItem("version", 1);
+            }
 
         } catch (error) {
             console.error("Error fetching file:", error);
@@ -1088,6 +1178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const repo = "thelamegame";
         const path = filename;
         const message = `Delete ${path} file`; // Commit message
+        const token = window.env.TOKEN;
 
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
 
@@ -1097,6 +1188,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
+                    "Authorization": `token ${token}`,
                     "Accept": "application/vnd.github.v3+json"
                 }
             });
@@ -1118,6 +1210,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "DELETE",
                 headers: {
+                    "Authorization": `token ${token}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -1135,6 +1228,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Error deleting file:", error);
         }
     }
+
 
 
 });
