@@ -1042,7 +1042,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const owner = "whashby";
         const repo = "thelamegame";
         const path = "db.json";
-        const token = "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";
+        const token = "Bearer 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";
 
         const data = {};
 
@@ -1114,7 +1114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const owner = "whashby";
         const repo = "thelamegame";
         const path = "db.json";
-        const token = "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";
+        const token = "Bearer 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";
 
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
 
@@ -1178,7 +1178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const repo = "thelamegame";
         const path = filename;
         const message = `Delete ${path} file`; // Commit message
-        const token = "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";
+        const token = "Bearer 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";
 
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
 
