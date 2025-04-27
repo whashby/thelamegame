@@ -1042,7 +1042,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const owner = "whashby";
         const repo = "thelamegame";
         const path = "db.json";
-        const token = window.env.TOKEN;
 
         const data = {};
 
@@ -1068,7 +1067,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
-                    "Authorization": `token ${token}`,
                     "Accept": "application/vnd.github.v3+json",
                 }
             });
@@ -1086,7 +1084,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "PUT",
                 headers: {
-                    "Authorization": `token ${token}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -1114,16 +1111,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const owner = "whashby";
         const repo = "thelamegame";
         const path = "db.json";
-        const token = window.env.TOKEN;
 
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
 
         try {
-            const response = await fetch(url, {
-                headers: {
-                    "Authorization": `token ${token}`,
-                }
-            });
+            const response = await fetch(url);
 
             if (!response.ok) {
 
@@ -1178,7 +1170,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const repo = "thelamegame";
         const path = filename;
         const message = `Delete ${path} file`; // Commit message
-        const token = window.env.TOKEN;
 
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
 
@@ -1188,7 +1179,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
-                    "Authorization": `token ${token}`,
                     "Accept": "application/vnd.github.v3+json"
                 }
             });
@@ -1210,7 +1200,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "DELETE",
                 headers: {
-                    "Authorization": `token ${token}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
