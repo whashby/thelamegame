@@ -1217,7 +1217,4 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Error deleting file:", error);
         }
     }
-
-
-
 });
