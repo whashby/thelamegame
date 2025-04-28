@@ -1105,7 +1105,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
     // Fetch Data from GitHub
     async function getData() {
 
