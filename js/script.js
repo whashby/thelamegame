@@ -1042,7 +1042,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const owner = "whashby";
         const repo = "thelamegame";
         const path = "db.json";
-        const token = "Bearer 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";
+        //const token = "Bearer";
 
         const data = {};
 
@@ -1058,8 +1058,6 @@ document.addEventListener("DOMContentLoaded", () => {
             data["version"] = localStorage.getItem("version");
         }
 
-        console.log("Data to be saved:", data);
-
         const content = btoa(JSON.stringify(data));
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
 
@@ -1068,8 +1066,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
-                    "Authorization": `token ${token}`,
                     "Accept": "application/vnd.github.v3+json",
+                    "Mode": "no-cors",
+                    "Bearer": "ghp_4r0v2x3c1d7e5f8a9b0c1e2f3g4h5i6j7k8l9m0n1o2p3q4r5s6t7u8v9w0x1y2z3",
                 }
             });
 
@@ -1086,13 +1085,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "PUT",
                 headers: {
-                    "Authorization": `token ${token}`,
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Mode": "no-cors",
+                    "Bearer": "ghp_4r0v2x3c1d7e5f8a9b0c1e2f3g4h5i6j7k8l9m0n1o2p3q4r5s6t7u8v9w0x1y2z3",
                 },
                 body: JSON.stringify({
                     message: `Update ${path}`,
                     content: content,
-                    sha: sha
+                    sha: sha // Include the file's SHA if it exists
                 })
             });
             if (response.ok) {
@@ -1110,20 +1110,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fetch Data from GitHub
     async function getData() {
 
-
-        const owner = "whashby";
         const repo = "thelamegame";
         const path = "db.json";
-        const token = "Bearer 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";
 
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
+        const url = `https://whashby.github.io/${repo}/data/${path}`;
 
         try {
-            const response = await fetch(url, {
-                headers: {
-                    "Authorization": `token ${token}`,
-                }
-            });
+            const response = await fetch(url);
 
             if (!response.ok) {
 
@@ -1131,15 +1124,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const fileData = await response.json();
-            const content = atob(fileData.content);
-            const parsedContent = JSON.parse(content);
 
-            const sha = fileData.sha;
+            if (fileData.highScores) {
 
-
-            if (parsedContent.highScores) {
-
-                const highScores = parsedContent.highScores;
+                const highScores = fileData.highScores;
                 localStorage.setItem("highScores", highScores);
 
             } else {
@@ -1147,9 +1135,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             console.log("highScores DB:", JSON.parse(localStorage.getItem("highScores")));
 
-            if (parsedContent.users) {
+            if (fileData.users) {
 
-                const users = parsedContent.users;
+                const users = fileData.users;
                 localStorage.setItem("users", users);
 
             } else {
@@ -1157,9 +1145,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            if (parsedContent.version) {
+            if (fileData.version) {
 
-                const version = parsedContent.version;
+                const version = fileData.version;
                 localStorage.setItem("version", version);
 
             } else {
@@ -1178,7 +1166,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const repo = "thelamegame";
         const path = filename;
         const message = `Delete ${path} file`; // Commit message
-        const token = "Bearer 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";
+        const token = "Bearer";
 
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
 
