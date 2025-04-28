@@ -1067,7 +1067,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "GET",
                 headers: {
                     "Accept": "application/vnd.github.v3+json",
-                    "Mode": "no-cors",
                     "Bearer": "ghp_4r0v2x3c1d7e5f8a9b0c1e2f3g4h5i6j7k8l9m0n1o2p3q4r5s6t7u8v9w0x1y2z3",
                 }
             });
@@ -1086,7 +1085,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Mode": "no-cors",
                     "Bearer": "ghp_4r0v2x3c1d7e5f8a9b0c1e2f3g4h5i6j7k8l9m0n1o2p3q4r5s6t7u8v9w0x1y2z3",
                 },
                 body: JSON.stringify({
