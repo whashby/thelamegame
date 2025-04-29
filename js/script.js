@@ -1065,12 +1065,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
-<<<<<<< HEAD
-                    "Accept": "application/json", 
-=======
-                    "Bearer": "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",
                     "Accept": "application/vnd.github.v3+json",
->>>>>>> 7b0a8cbbf6130010128941084f480af960557cfc
                 }
             });
 
@@ -1088,16 +1083,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
-<<<<<<< HEAD
                     "Accept": "application/vnd.github.v3+json",
-=======
-                    "Accept": "application/vnd.github.v3+json"
-                    {
-                        "access_token": "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",
-                        "scope": "repo",
-                        "token_type": "bearer",
-                    }, 
->>>>>>> 7b0a8cbbf6130010128941084f480af960557cfc
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
@@ -1191,6 +1177,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
 
+
             if (response.ok) {
                 const fileData = await response.json();
                 sha = fileData.sha; // Extract the file's SHA
@@ -1208,7 +1195,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "DELETE",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     message: message,
