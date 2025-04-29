@@ -1042,7 +1042,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const owner = "whashby";
         const repo = "thelamegame";
         const path = "db.json";
-        //const token = "Bearer";
 
         const data = {};
 
@@ -1083,11 +1082,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "PUT",
                 headers: {
+                    "Authorization": "token GITHUB_TOKEN",
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     message: `Update ${path}`,
                     content: content,
+                    branch: "main", // Specify the branch if needed
                     sha: sha // Include the file's SHA if it exists
                 })
             });
