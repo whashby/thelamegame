@@ -88,6 +88,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setData();
 
+
+
+
+
+    
     const gameDialogue = {
         1: {
             content: "Welcome to the Threshold Layer. Here, intelligence dances with simplicity - but don't be deceived. Decode the numbers, hacker. Find the primes hidden in the sequence. Only the worthy pass through these gates.",
@@ -1157,7 +1162,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
     }
-
     // Delete Data from GitHub
     async function deleteData(filename) {
         const owner = "whashby";
