@@ -1065,9 +1065,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
+                    "Bearer": "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",
                     "Accept": "application/vnd.github.v3+json",
                 }
             });
+
 
             if (response.ok) {
                 const existingFile = await response.json();
@@ -1082,7 +1084,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "PUT",
                 headers: {
-                    "Authorization": "token GITHUB_TOKEN",
+                    "Accept": "application/vnd.github.v3+json"
+                    {
+                        "access_token": "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",
+                        "scope": "repo",
+                        "token_type": "bearer",
+                    }, 
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
@@ -1172,7 +1179,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
-                    "Authorization": `token ${token}`,
                     "Accept": "application/vnd.github.v3+json"
                 }
             });
