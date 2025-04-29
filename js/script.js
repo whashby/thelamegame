@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error fetching data:", error);
     }
 
-
+    setData();
 
     const gameDialogue = {
         1: {
