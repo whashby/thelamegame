@@ -1065,9 +1065,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
-                    "Accept": "application/vnd.github.v3+json",
+                    "Accept": "application/json", 
                 }
             });
+
 
             if (response.ok) {
                 const existingFile = await response.json();
@@ -1080,9 +1081,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             const response = await fetch(url, {
-                method: "PUT",
+                method: "POST",
                 headers: {
-                    "Authorization": "token GITHUB_TOKEN",
+                    "Accept": "application/vnd.github.v3+json",
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
@@ -1172,7 +1173,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
-                    "Authorization": `token ${token}`,
                     "Accept": "application/vnd.github.v3+json"
                 }
             });
