@@ -1105,13 +1105,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     'Authorization': `token ${secrets.GH_TOKEN}`,
                     "Content-Type": "application/json",
                 },
-                name: "db.json",
                 body: JSON.stringify({
                     message: `Update ${path}`,
                     content: content,
                     branch: "main",
                     sha: sha
-                })
+                }),
+                version: version
+                
             })
             if (response.ok) {
                 console.log("Version updated successfully.");
