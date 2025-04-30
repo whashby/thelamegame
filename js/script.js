@@ -1096,8 +1096,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({
                     message: `Update ${path}`,
                     content: content,
-                    branch: "main", // Specify the branch if needed
-                    sha: sha // Include the file's SHA if it exists
+                    branch: "main",
+                    sha: sha
                 })
             });
             if (response.ok) {
