@@ -1075,12 +1075,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const content = btoa(JSON.stringify(data));
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/`;
-        //const url = `https://whashby.github.io/${repo}/data`;
+        const put_url = `https://api.github.com/repos/${owner}/${repo}/contents/data/`;
+        const get_url = `https://whashby.github.io/${repo}/data`;
 
         let sha;
         try {
-            const response = await fetch(url, {
+            const response = await fetch(get_url, {
                 method: "GET",
                 name: "db.json",
                 headers: {
@@ -1109,7 +1109,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 content: content,
             });*/
 
-                const response = await fetch(url, {
+                const response = await fetch(put_url, {
                     method: "POST",
                     headers: {
                         "Authorization": GH_TOKEN,
