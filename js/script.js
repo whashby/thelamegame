@@ -1097,6 +1097,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 path: 'data/db.json',
                 message: 'Update db.json',
                 content: content,
+            });
 
                 /*const response = await fetch(url, {
                     method: "POST",
