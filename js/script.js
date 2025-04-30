@@ -1102,7 +1102,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(put_url, {
                 method: "POST",
                 headers: {
-                    'Authorization': `token ${process.env.GH_TOKEN}`,
+                    'Authorization': `token ${env.GH_TOKEN}`,
                     "Content-Type": "application/json",
                 },
                 name: "db.json",
