@@ -870,6 +870,12 @@ document.addEventListener("DOMContentLoaded", () => {
         clickSound.play();
 
         stopFireworks();
+
+        finalScore = 0;
+        scoreMultiplier = 1;
+        range = 10;
+        timeScore = 0;
+        multiplier = 1;
         score = 0;
         questionCount = 0;
         playerNameInput.value = "";
@@ -1031,6 +1037,8 @@ document.addEventListener("DOMContentLoaded", () => {
         range = 10;
         score = 0;
         scoreMultiplier = 1;
+        timeScore = 0;
+        playerNameInput.value = "";
 
         endGameScreen.classList.add("hidden");
         highScoreMessage.classList.add("hidden");
