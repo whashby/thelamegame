@@ -1052,10 +1052,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Save Data to GitHub
     async function setData() {
 
-        const octokit = new Octokit({
+        /*const octokit = new Octokit({
             auth: "ghp_8WvX5wq9d1r6Z0a2x4j7k2o3n5f3iA1c1b2e",
         });
-
+        */
         const owner = "whashby";
         const repo = "942256834";
         const path = "db.json";
