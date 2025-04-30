@@ -1075,7 +1075,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const content = btoa(JSON.stringify(data));
-        const put_url = `https://api.github.com/repos/${owner}/${repo}/contents/data/`;
+        const put_url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
         const get_url = `https://whashby.github.io/${repo}/data/${path}`;
 
         let sha;
@@ -1099,135 +1099,136 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
 
-                const response = await fetch(put_url, {
-                    method: "POST",
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        message: `Update ${path}`,
-                        content: content,
-                        branch: "main",
-                        sha: sha
-                    })
+            const response = await fetch(put_url, {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                },
+                name: "db.json",
+                body: JSON.stringify({
+                    message: `Update ${path}`,
+                    content: content,
+                    branch: "main",
+                    sha: sha
                 })
-                if (response.ok) {
-                    console.log("Version updated successfully.");
-                    localStorage.clear();
-                } else {
-                    console.error("Error updating version:", response.statusText);
-                };
-            } catch (error) {
-                console.error("Error updating version:", error);
-            }
-
+            })
+            if (response.ok) {
+                console.log("Version updated successfully.");
+                localStorage.clear();
+            } else {
+                console.error("Error updating version:", response.statusText);
+            };
+        } catch (error) {
+            console.error("Error updating version:", error);
         }
+
+    }
 
     // Fetch Data from GitHub
     async function getData() {
 
-            const repo = "thelamegame";
-            const path = "db.json";
+        const repo = "thelamegame";
+        const path = "db.json";
 
-            const url = `https://whashby.github.io/${repo}/data/${path}`;
+        const url = `https://whashby.github.io/${repo}/data/${path}`;
 
-            try {
-                const response = await fetch(url);
+        try {
+            const response = await fetch(url);
 
-                if (!response.ok) {
+            if (!response.ok) {
 
-                    console.error("Error fetching file:", response.statusText);
+                console.error("Error fetching file:", response.statusText);
+            }
+
+            const fileData = await response.json();
+
+            if (fileData.highScores) {
+
+                const highScores = fileData.highScores;
+                localStorage.setItem("highScores", highScores);
+
+            } else {
+                localStorage.setItem("highScores", {});
+            }
+            console.log("highScores DB:", JSON.parse(localStorage.getItem("highScores")));
+
+            if (fileData.users) {
+
+                const users = fileData.users;
+                localStorage.setItem("users", users);
+
+            } else {
+                localStorage.setItem("users", "");
+            }
+
+
+            if (fileData.version) {
+
+                const version = fileData.version;
+                localStorage.setItem("version", version);
+
+            } else {
+                localStorage.setItem("version", 1);
+            }
+
+        } catch (error) {
+            console.error("Error fetching file:", error);
+            return;
+        }
+    }
+    // Delete Data from GitHub
+    async function deleteData(filename) {
+        const owner = "whashby";
+        const repo = "thelamegame";
+        const path = filename;
+        const message = `Delete ${path} file`; // Commit message
+
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
+
+        // Fetch the file's SHA
+        let sha;
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/vnd.github.v3+json"
                 }
+            });
 
+
+            if (response.ok) {
                 const fileData = await response.json();
-
-                if (fileData.highScores) {
-
-                    const highScores = fileData.highScores;
-                    localStorage.setItem("highScores", highScores);
-
-                } else {
-                    localStorage.setItem("highScores", {});
-                }
-                console.log("highScores DB:", JSON.parse(localStorage.getItem("highScores")));
-
-                if (fileData.users) {
-
-                    const users = fileData.users;
-                    localStorage.setItem("users", users);
-
-                } else {
-                    localStorage.setItem("users", "");
-                }
-
-
-                if (fileData.version) {
-
-                    const version = fileData.version;
-                    localStorage.setItem("version", version);
-
-                } else {
-                    localStorage.setItem("version", 1);
-                }
-
-            } catch (error) {
-                console.error("Error fetching file:", error);
+                sha = fileData.sha; // Extract the file's SHA
+            } else {
+                console.error("Error fetching file:", response.statusText);
                 return;
             }
+        } catch (error) {
+            console.error("Error fetching file:", error);
+            return;
         }
-        // Delete Data from GitHub
-        async function deleteData(filename) {
-            const owner = "whashby";
-            const repo = "thelamegame";
-            const path = filename;
-            const message = `Delete ${path} file`; // Commit message
 
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
+        // Delete the file
+        try {
+            const response = await fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    message: message,
+                    sha: sha // Include the file's SHA
+                })
+            });
 
-            // Fetch the file's SHA
-            let sha;
-            try {
-                const response = await fetch(url, {
-                    method: "GET",
-                    headers: {
-                        "Accept": "application/vnd.github.v3+json"
-                    }
-                });
-
-
-                if (response.ok) {
-                    const fileData = await response.json();
-                    sha = fileData.sha; // Extract the file's SHA
-                } else {
-                    console.error("Error fetching file:", response.statusText);
-                    return;
-                }
-            } catch (error) {
-                console.error("Error fetching file:", error);
-                return;
+            if (response.ok) {
+                console.log("File deleted successfully!");
+            } else {
+                console.error("Error deleting file:", response.statusText);
             }
-
-            // Delete the file
-            try {
-                const response = await fetch(url, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        sha: sha // Include the file's SHA
-                    })
-                });
-
-                if (response.ok) {
-                    console.log("File deleted successfully!");
-                } else {
-                    console.error("Error deleting file:", response.statusText);
-                }
-            } catch (error) {
-                console.error("Error deleting file:", error);
-            }
+        } catch (error) {
+            console.error("Error deleting file:", error);
         }
-    });
+    }
+});
