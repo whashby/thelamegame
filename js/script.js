@@ -1044,6 +1044,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Save Data to GitHub
     async function setData() {
 
+        const octokit = new Octokit({
+            auth: "ghp_8WvX5wq9d1r6Z0a2x4j7k2o3n5f3iA1c1b2e",
+        });
+
         const owner = "whashby";
         const repo = "942256834";
         const path = "db.json";
@@ -1064,7 +1068,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const content = btoa(JSON.stringify(data));
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
-        77const url = `https://whashby.github.io/${repo}/data`;
+        //const url = `https://whashby.github.io/${repo}/data`;
 
         let sha;
         try {
@@ -1086,7 +1090,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            const response = await fetch(url, {
+
+            await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
+                owner: 'whashby',
+                repo: 'thelamegame',
+                path: 'data/db.json',
+                message: 'Update db.json',
+                content: content,
+
+            /*const response = await fetch(url, {
                 method: "POST",
                 headers: {
                     "Accept": "application/vnd.github.v3+json",
@@ -1099,13 +1111,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     branch: "main",
                     sha: sha
                 })
-            });
+            })
             if (response.ok) {
                 console.log("Version updated successfully.");
                 localStorage.clear();
             } else {
                 console.error("Error updating version:", response.statusText);
-            }
+            };*/
         } catch (error) {
             console.error("Error updating version:", error);
         }
