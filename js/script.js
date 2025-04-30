@@ -1084,7 +1084,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "GET",
                 name: "db.json",
                 headers: {
-                    "Authorization": "Bearer ghp_8WvX5wq9d1r6Z0a2x4j7k2o3n5f3iA1c1b2e",
                     "Accept": "application/vnd.github.v3+json",
                 }
             });
