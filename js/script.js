@@ -1045,7 +1045,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function setData() {
 
         const owner = "whashby";
-        const repo = "thelamegame";
+        const repo = "942256834";
         const path = "db.json";
 
         const data = {};
@@ -1063,8 +1063,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const content = btoa(JSON.stringify(data));
-        //const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
-        const url = `https://whashby.github.io/${repo}/data`;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
+        77const url = `https://whashby.github.io/${repo}/data`;
 
         let sha;
         try {
