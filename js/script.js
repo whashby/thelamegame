@@ -1075,7 +1075,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const content = btoa(JSON.stringify(data));
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/`;
         //const url = `https://whashby.github.io/${repo}/data`;
 
         let sha;
@@ -1114,6 +1114,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         "Accept": "application/vnd.github.v3+json",
                         "Content-Type": "application/json",
                     },
+                    name: "db.json",
                     body: JSON.stringify({
                         message: `Update ${path}`,
                         content: content,
