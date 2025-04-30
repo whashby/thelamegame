@@ -1057,7 +1057,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         */
         const owner = "whashby";
-        const repo = "942256834";
+        const repo = "thelamegame";
         const path = "db.json";
 
         const data = {};
