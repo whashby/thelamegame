@@ -1099,21 +1099,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
 
-            await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
+            /*await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
                 owner: 'whashby',
                 repo: 'thelamegame',
                 path: 'data/db.json',
                 message: 'Update db.json',
                 content: content,
-            });
+            });*/
 
-                /*const response = await fetch(url, {
+                const response = await fetch(url, {
                     method: "POST",
                     headers: {
+                        "Authorization": "Bearer ghp_8WvX5wq9d1r6Z0a2x4j7k2o3n5f3iA1c1b2e",
                         "Accept": "application/vnd.github.v3+json",
                         "Content-Type": "application/json",
                     },
-                    name: "db.json",
                     body: JSON.stringify({
                         message: `Update ${path}`,
                         content: content,
@@ -1126,7 +1126,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     localStorage.clear();
                 } else {
                     console.error("Error updating version:", response.statusText);
-                };*/
+                };
             } catch (error) {
                 console.error("Error updating version:", error);
             }
