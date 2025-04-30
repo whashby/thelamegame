@@ -1097,7 +1097,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     message: `Update ${path}`,
                     content: content,
                     branch: "main", // Specify the branch if needed
-                    X- GitHub - Api - Version: "2022-11-28",
                     sha: sha // Include the file's SHA if it exists
                 })
             });
