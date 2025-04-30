@@ -1082,7 +1082,6 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const response = await fetch(get_url, {
                 method: "GET",
-                name: "db.json",
                 headers: {
                     "Accept": "application/vnd.github.v3+json",
                 }
