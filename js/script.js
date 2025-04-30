@@ -1099,22 +1099,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
 
-            /*await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
-                owner: 'whashby',
-                repo: 'thelamegame',
-                path: 'data/db.json',
-                message: 'Update db.json',
-                content: content,
-            });*/
-
                 const response = await fetch(put_url, {
                     method: "POST",
                     headers: {
-                        "Authorization": GH_TOKEN,
                         "Accept": "application/json",
                         "Content-Type": "application/json",
                     },
-                    name: "db.json",
                     body: JSON.stringify({
                         message: `Update ${path}`,
                         content: content,
