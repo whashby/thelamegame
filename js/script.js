@@ -1064,11 +1064,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const content = btoa(JSON.stringify(data));
         //const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
-        const url = `https://whashby.github.io/${repo}/data/${path}`;
+        const url = `https://whashby.github.io/${repo}/data`;
 
         let sha;
         try {
-            const response = await fetch(url, {
+            const response = await fetch(`${url}/${path}`, {
                 method: "GET",
                 headers: {
                     "Accept": "application/vnd.github.v3+json",
@@ -1092,6 +1092,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Accept": "application/vnd.github.v3+json",
                     "Content-Type": "application/json",
                 },
+                name: "db.json",
                 body: JSON.stringify({
                     message: `Update ${path}`,
                     content: content,
