@@ -1076,7 +1076,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const content = btoa(JSON.stringify(data));
         const put_url = `https://api.github.com/repos/${owner}/${repo}/contents/data/`;
-        const get_url = `https://whashby.github.io/${repo}/data`;
+        const get_url = `https://whashby.github.io/${repo}/data/${path}`;
 
         let sha;
         try {
