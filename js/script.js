@@ -1068,7 +1068,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let sha;
         try {
-            const response = await fetch(`${url}/${path}`, {
+            const response = await fetch(url, {
                 method: "GET",
                 headers: {
                     "Accept": "application/vnd.github.v3+json",
