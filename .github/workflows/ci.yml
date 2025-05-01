@@ -23,4 +23,4 @@ jobs:
       - name: Build the project
         run: npm run build
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ process.env.GH_TOKEN }}

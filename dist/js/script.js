@@ -1041,7 +1041,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return fetch(put_url, {
               method: "POST",
               headers: {
-                'Authorization': "token ".concat(secrets.GH_TOKEN),
+                  'Authorization': "token ".concat(process.env.GH_TOKEN),
                 "Content-Type": "application/json"
               },
               body: JSON.stringify({
