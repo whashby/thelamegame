@@ -1051,14 +1051,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Save Data to GitHub
     async function setData() {
-
-        /*const octokit = new Octokit({
-            auth: "ghp_8WvX5wq9d1r6Z0a2x4j7k2o3n5f3iA1c1b2e",
-        });
-        */
         const owner = "whashby";
         const repo = "thelamegame";
         const path = "db.json";
+        const token = "11AAGPC4I0xJQFlZPINn1C_fN3RCp53CbDThvWKgJNSlBGFBFQ82ucWCWKt3NY1SQsGWVSJHP6WcKRJ4le"
 
         const data = {};
 
@@ -1102,7 +1098,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(put_url, {
                 method: "POST",
                 headers: {
-                    'Authorization': `Bearer ${{ secrets.GITHUB_TOKEN }}`,
+                    'Authorization': `Bearer github_pat_${token}`,
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
