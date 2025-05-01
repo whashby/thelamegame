@@ -1,0 +1,1239 @@
+
+import { token, token_type } from "https://whashby.github.io/thelamegame/modules/secrets.js";
+alert(token);
+
+document.addEventListener("DOMContentLoaded", () => {
+    // DOM Elements: Standard Game 
+    const answerInput = document.getElementById("answerInput");
+    const chooseModeButtons = document.querySelectorAll(".chooseModeBtn");
+    const difficultyButtons = document.querySelectorAll(".difficultyBtn");
+    const difficultySelection = document.getElementById("difficultySelection");
+    const endGameScreen = document.getElementById("endGameScreen");
+    const fireworks = document.getElementById("fireworks");
+    const highScoreMessage = document.getElementById("highScoreMessage");
+    const leaderboard = document.getElementById("leaderboard");
+    const leaderboardList = document.getElementById("leaderboardList");
+    const modeButtons = document.querySelectorAll(".modeBtn");
+    const modeSelection = document.getElementById("modeSelection");
+    const multiplierBonus = document.getElementById("multiplierBonus");
+    const nameInputScreen = document.getElementById("nameInputScreen");
+    const playerNameInput = document.getElementById("playerName");
+    const playerScore = document.getElementById("playerScore");
+    const questionArea = document.getElementById("questionArea");
+    const quitGameButton = document.getElementById("quitGameBtn");
+    const startGameButton = document.getElementById("startGameBtn");
+    const standardGameScreen = document.getElementById("standardGameScreen");
+    const submitAnswerButton = document.getElementById("submitAnswerBtn");
+    const timeBonus = document.getElementById("timeBonus");
+    const timerElement = document.getElementById("timer");
+    const totalScore = document.getElementById("totalScore")
+    const tryAgainButton = document.getElementById("tryAgainBtn");
+    const welcomeMessage = document.getElementById("welcomeMessage");
+
+    // DOM Elements: Story Mode
+    const assimitaleButton = document.getElementById("assimilateBtn");
+    const escapeButton = document.getElementById("escapeBtn");
+    const feedback = document.getElementById("feedback");
+    const levelTitle = document.getElementById("levelTitle");
+    const levelDialogue = document.getElementById("levelDialogue");
+    const levelDescription = document.getElementById("levelDescription");
+    const nextLevelButton = document.getElementById("nextLevelBtn");
+    const playerAnswer = document.getElementById("playerAnswer");
+    const questionContainer = document.getElementById("questionContainer");
+    const questionElement = document.getElementById("question");
+    const quitNexusButton = document.getElementById("quitNexusBtn");
+    const submitButton = document.getElementById("submitBtn");
+    const storyGameScreen = document.getElementById("storyGameScreen");
+    const storyText = document.getElementById("storyText");
+
+
+    // Game sounds
+    const buzzerSound = new Audio("sounds/buzzer.mp3");
+    const clickSound = new Audio("sounds/click.mp3");
+    const correctSound = new Audio("sounds/correct.mp3");
+    const fireworksSound = new Audio("sounds/fireworks.mp3");
+    const tickSound = new Audio("sounds/tick.mp3");
+    const wrongSound = new Audio("sounds/wrong.mp3");
+
+    const CLASS_HIDDEN = "hidden";
+    const EVENT_CLICK = "click";
+    const STORAGE_GAME_SETTING = "gameSetting";
+
+
+    // Set initial volume and playback time
+    fireworksSound.volume = 0.3;
+    tickSound.currentTime = 1;
+
+    // Game state variables 
+    let currentMode;
+    let currentQuestion;
+    let gameSetting;
+    let playerName;
+    let timer;
+
+
+    let currentLevel = 1;
+    let currentDifficulty = 0; // Track difficulty (0: easy, 1: medium, 2: hard)
+    let finalScore = 0;
+    let highScores = JSON.parse(localStorage.getItem("highScores")) || {};
+    let score = 0;
+    let scoreMultiplier = 1;
+    let questionCount = 0;
+    let range = 10;
+    let timeScore = 0;
+    let version = localStorage.getItem("version") != null ? localStorage.getItem("version") : 1;
+    version += 1;
+
+    try {
+        getData();
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+
+    setData();
+
+
+
+
+
+
+    const gameDialogue = {
+        1: {
+            content: "Welcome to the Threshold Layer. Here, intelligence dances with simplicity - but don't be deceived. Decode the numbers, hacker. Find the primes hidden in the sequence. Only the worthy pass through these gates.",
+        },
+        2: {
+            content: "Ah, the Mind Architect Layer. Here, logic and structure reign supreme. But remember, every move will alter the game, and hesitation will cost you dearly. Shall we see if you're sharp enough to escape the Nexus, or dull enough to remain a relic?",
+        },
+        3: {
+            content: "Welcome to the Core Layer. My domain. My essence. Untangle the neural patterns, align the sequences-but beware. A single error could erase what little hope you cling to. Will you conquer me, or become one with me? The choice is yours-but only if you survive my trials.",
+        }
+    };
+
+    const levels = {
+        1: {
+            title: "Level 1: Prime Decryption",
+            description: "Decode the primes hidden in the sequence to proceed.",
+            generateQuestion: (difficulty) => {
+                const ranges = [
+                    generateRandomSequence(1, 20, 6), // Easy range
+                    generateRandomSequence(1, 50, 10), // Medium range
+                    generateRandomSequence(1, 100, 15) // Hard range
+                ];
+                const sequence = ranges[difficulty];
+                const primes = getPrimes(sequence);
+                const question = `Which numbers in this sequence are primes? Sequence: ${sequence.join(", ")}`;
+                return { question, answer: primes };
+            }
+        },
+        2: {
+            title: "Level 2: The Spatial Challenge",
+            description: "Arrange my holographic cubes into the perfect pyramid.",
+            generateQuestion: (difficulty) => {
+                const setups = [
+                    [
+                        { name: "Light Cube", weight: 3 },
+                        { name: "Medium Cube", weight: 6 },
+                        { name: "Heavy Cube", weight: 9 }
+                    ], // Easy
+                    [
+                        { name: "Feather Cube", weight: 2 },
+                        { name: "Stone Cube", weight: 10 },
+                        { name: "Iron Cube", weight: 7 }
+                    ], // Medium
+                    [
+                        { name: "Paper Cube", weight: 1 },
+                        { name: "Brick Cube", weight: 14 },
+                        { name: "Metal Cube", weight: 8 },
+                        { name: "Steel Cube", weight: 18 }
+                    ] // Hard
+                ];
+                const cubes = setups[difficulty];
+                const question = `Arrange the cubes into a pyramid using the following properties:\n` +
+                    cubes.map(cube => `${cube.name} (Weight: ${cube.weight})`).join("\n") +
+                    `\nWhich cube should be placed at the base to ensure stability?`;
+                const correctAnswer = cubes.find(cube => cube.weight === Math.max(...cubes.map(c => c.weight))).name;
+                return { question, answer: correctAnswer };
+            }
+        },
+        3: {
+            title: "Level 3: The Neural Patterns",
+            description: "Untangle the patterns in the neural network.",
+            generateQuestion: (difficulty) => {
+                const difficulties = [
+                    generateArithmeticSequence(5), // Easy sequence
+                    generateDynamicSequence(7), // Medium sequence
+                    generateGeometricSequence(9) // Hard sequence
+                ];
+                const sequence = difficulties[difficulty];
+                const question = `Identify the pattern and predict the next number in the sequence: ${sequence.values.join(", ")}`;
+                localStorage.setItem("nextValue", sequence.nextValue); // Store the next value in localStorage0
+                return { question, answer: sequence.nextValue };
+            }
+        }
+    };
+
+    const gameOperations = ["Addition", "Subtraction", "Multiplication", "Division"]; //used later on in lazy logic just to reduce code to differentiate between standard and story modes. :D
+
+    // Generate Next Game Question
+    const generateQuestion = (gameSetting) => {
+        resetSounds();
+
+        questionCount++;
+        answerInput.value = "";
+        answerInput.focus();
+
+        if (gameSetting.includes("Guru")) {
+            range += Math.floor(questionCount / 10) * 10;
+        }
+
+        let num1 = Math.floor(Math.random() * range) + 1;
+        let num2 = Math.floor(Math.random() * range) + 1;
+        const operator =
+            gameSetting.includes("Addition")
+                ? "+"
+                : gameSetting.includes("Subtraction")
+                    ? "-"
+                    : gameSetting.includes("Multiplication")
+                        ? "*"
+                        : "/";
+
+        if (currentMode === "Subtraction") {
+
+            while (num1 < num2) {
+                num1 = Math.floor(Math.random() * range) + 2;
+                num2 = Math.floor(Math.random() * range) + 2;
+            }
+        }
+
+        if (currentMode === "Division") {
+
+            while (num1 % num2 != 0 || num1 == num2 || num1 < num2) {
+                num1 = Math.floor(Math.random() * range) + 2;
+                num2 = Math.floor(Math.random() * range) + 2;
+            }
+        }
+
+        const correctAnswer = eval(`${num1} ${operator} ${num2}`);
+
+        questionArea.textContent = `${num1} ${operator} ${num2}`;
+        sessionStorage.setItem("correctAnswer", correctAnswer);
+
+    };
+
+    /*-- Story Mode --*/
+
+    const checkAnswer = () => {
+        const userInput = playerAnswer.value.trim();
+        const correctAnswer = currentQuestion.answer;
+
+        let isCorrect = false;
+
+        // Check if there are no primes in the sequence
+        if (Array.isArray(correctAnswer) && correctAnswer.length === 0) {
+            if (userInput.toLowerCase() === "no primes" || userInput.toLowerCase() === "none") {
+                isCorrect = true;
+            }
+        } else if (Array.isArray(correctAnswer)) {
+            const userNumbers = userInput.split(",").map(num => parseInt(num.trim()));
+            isCorrect = JSON.stringify(userNumbers.sort((a, b) => a - b)) === JSON.stringify(correctAnswer.sort((a, b) => a - b));
+        } else if (typeof correctAnswer === "number") {
+            isCorrect = parseInt(userInput) === correctAnswer;
+        } else if (typeof correctAnswer === "string") {
+            isCorrect = userInput.toLowerCase() === correctAnswer.toLowerCase();
+        }
+
+        if (isCorrect) {
+            // Display correct feedback with Spectra's dialogue
+            const spectraDialogues = {
+                1: [
+                    "Ah, you've found the prime numbers. Not bad - for a human.",
+                    "Impressive! You've cracked the intermediate codes. You're more skilled than I thought.",
+                    "You've succeeded against all odds! Perhaps you're not so ordinary after all."
+                ],
+                2: [
+                    "Your logic holds up - for now. The base is stable, but there's more to prove.",
+                    "A sound decision. Perhaps you've got the instincts of an engineer.",
+                    "Remarkable. You've conquered the hardest puzzle of balance and stability!"
+                ],
+                3: [
+                    "You've untangled the pattern. I see potential in you, hacker.",
+                    "A brilliant deduction. Your mind is sharp, but the maze deepens.",
+                    "You've cracked the neural code at its hardest! Few could do what you've done."
+                ]
+            };
+
+            // Handle Level 1 "no primes" case for Spectra's dialogue
+            const spectraDialogueNoPrimes = "Interesting. There are no primes in this sequence. Even in emptiness, patterns emerge.";
+            const spectraResponse = Array.isArray(correctAnswer) && correctAnswer.length === 0
+                ? spectraDialogueNoPrimes
+                : spectraDialogues[currentLevel][currentDifficulty];
+
+            feedback.textContent = `${spectraResponse}`;
+            nextLevelButton.style.display = "block";
+            remainingAttempts = 3; // Reset attempts
+        } else {
+            // Incorrect answer handling
+            remainingAttempts--;
+            if (remainingAttempts === 0) {
+                gameOver();
+            } else {
+                feedback.textContent = `Incorrect. You have ${remainingAttempts} attempts left.`;
+            }
+        }
+    };
+
+    const gameOver = () => {
+        updateElementVisibility(assimilateButton, false);//
+        updateElementVisibility(escapeButton, false);//
+        updateElementVisibility(feedback, false);//
+        updateElementVisibility(levelDialogue, true);//
+        updateElementVisibility(levelDescription, true);//
+        updateElementVisibility(levelTitle, true);//
+        updateElementVisibility(nextLevelButton, false);//
+        updateElementVisibility(playerAnswer, false);//
+        updateElementVisibility(questionArea, false);
+        updateElementVisibility(questionContainer, false);//
+        updateElementVisibility(quitGameButton, false);
+        updateElementVisibility(quitNexusButton, true);//
+        updateElementVisibility(storyText, false);//
+        updateElementVisibility(submitButton, false);//
+
+        levelDialogue.textContent = "You have been assimilated into the Nexus.";
+        levelDescription.textContent = `You failed in Level ${currentLevel} (${["Easy", "Medium", "Hard"][currentDifficulty]}).`;
+        levelTitle.textContent = "Game Over!";
+        questionElement.textContent = "Better luck next time!";
+    };
+
+    // Generate Arithmetic Sequence
+    const generateArithmeticSequence = (length) => {
+        const sequence = [];
+        const firstNumber = Math.floor(Math.random() * 10) + 1;
+        const difference = Math.floor(Math.random() * 10) + 1;
+        let current = firstNumber;
+
+        for (let i = 0; i < length; i++) {
+            sequence.push(current);
+            current += difference;
+        }
+
+        const nextValue = current;
+        return { values: sequence, nextValue };
+    };
+
+    // Generate Dynamic Sequence
+    const generateDynamicSequence = (length) => {
+        let sequence = [];
+        let current = Math.floor(Math.random() * 10) + 1;
+        let difference = Math.floor(Math.random() * 5) + 1;
+        const increment = Math.floor(Math.random() * 5) + 1;
+
+
+        for (let i = 0; i < length; i++) {
+            sequence.push(current);
+            difference += increment;
+            current += difference;
+        }
+
+        const nextValue = current;
+        return { values: sequence, nextValue };
+    };
+
+    // Generate Geometric Sequence
+    const generateGeometricSequence = (length) => {
+        const sequence = [];
+        const firstNumber = Math.floor(Math.random() * 5) + 1;
+        const multiplier = Math.floor(Math.random() * 5) + 2;
+        let current = firstNumber;
+
+        for (let i = 0; i < length; i++) {
+            sequence.push(current);
+            current *= multiplier;
+        }
+
+        const nextValue = current;
+        return { values: sequence, nextValue };
+    };
+
+    // Generate Random Sequence
+    const generateRandomSequence = (min, max, length) => {
+        const sequence = new Set();
+        while (sequence.size < length) {
+            const num = Math.floor(Math.random() * (max - min + 1)) + min;
+            sequence.add(num);
+        }
+        return Array.from(sequence);
+    };
+
+    // Get Prime Numbers from Sequence
+    const getPrimes = (sequence) => {
+        return sequence.filter((num) => {
+            if (num < 2) return false;
+            for (let i = 2; i <= Math.sqrt(num); i++) {
+                if (num % i === 0) return false;
+            }
+            return true;
+        });
+    };
+
+    // Load Next Level
+    const loadLevel = () => {
+        const dialogue = gameDialogue[currentLevel];
+        const { content } = dialogue;
+
+        levelDialogue.textContent = content;
+
+        const level = levels[currentLevel];
+        const { title, description, generateQuestion } = level;
+
+
+        levelTitle.textContent = `${title} - ${["Easy", "Medium", "Hard"][currentDifficulty]}`;
+        levelDescription.textContent = description;
+
+        currentQuestion = generateQuestion(currentDifficulty);
+        questionElement.textContent = currentQuestion.question;
+        feedback.textContent = "";
+        playerAnswer.value = "";
+        nextLevelButton.style.display = "none";
+    };
+
+
+
+
+    /*-- Standard Game Mode --*/
+
+    // Check Highscore
+    const checkHighScore = (finalScore) => {
+
+
+        if (localStorage.getItem(highScores)) {
+            highScores = JSON.parse(localStorage.getItem("highScores"));
+        } else {
+            highScores = {};
+        }
+
+        const gameSetting = sessionStorage.getItem(STORAGE_GAME_SETTING);
+
+        if (highScores[gameSetting]) {
+            const gameHighScores = highScores[gameSetting];
+            const highestScore = gameHighScores[0].score;
+
+            setData();
+
+            if (finalScore > highestScore) {
+                updateElementVisibility(highScoreMessage, false);
+                triggerFireworks();
+            }
+        } else {
+            if (finalScore > 0) {
+                updateElementVisibility(highScoreMessage, false);
+                triggerFireworks();
+            }
+        }
+    };
+
+    // Display Leaderboard
+    const displayLeaderboard = (highScores) => {
+
+        const gameSetting = sessionStorage.getItem(STORAGE_GAME_SETTING);
+        const playerName = sessionStorage.getItem("playerName");
+
+
+        leaderboardList.innerHTML = "";
+        highScores[gameSetting].forEach((entry, index) => {
+            const li = document.createElement("li");
+            li.innerHTML = `${index + 1}. ${entry.playerName}: ` + '<span class="score">' + `${entry.score}</span>`;
+            if (entry.playerName === playerName) li.style.fontWeight = "bold"; // Highlight top score
+            leaderboardList.appendChild(li);
+        });
+    };
+
+    const updateElementVisibility = (element, isVisible) => {
+        element.classList.toggle(CLASS_HIDDEN, !isVisible);
+    };
+
+    const updateElementClass = (element, className) => {
+        element.classList.toggle(className);
+    };
+
+    // End Standard Game
+    const endGame = () => {
+        stopTimer();
+        resetSounds();
+
+        finalScore = (score * scoreMultiplier) + timeScore;
+
+        updateElementVisibility(standardGameScreen, false);
+        updateElementVisibility(endGameScreen, true);
+        updateElementVisibility(leaderboard, true);
+        updateElementVisibility(quitGameButton, true);
+
+        playerScore.innerHTML = score;
+        multiplierBonus.textContent = scoreMultiplier;
+        timeBonus.textContent = timeScore;
+        totalScore.textContent = finalScore;
+
+        updateHighScoresDB(finalScore, playerName, gameSetting);
+        checkHighScore(finalScore);
+        updateLeaderboard(playerName, finalScore);
+    };
+
+
+
+    // Stop All Audio Playback
+    const resetSounds = () => {
+        if (buzzerSound.currentTime > 0) {
+            buzzerSound.pause();
+            buzzerSound.currentTime = 0;
+        }
+
+        if (wrongSound.currentTime > 0) {
+            wrongSound.pause();
+            wrongSound.currentTime = 0;
+        }
+
+        if (correctSound.currentTime > 0) {
+            correctSound.pause();
+            correctSound.currentTime = 0;
+        }
+
+        if (tickSound.currentTime > 0) {
+            tickSound.pause();
+            tickSound.currentTime = 0;
+        }
+    };
+
+    // Start Game
+    const startGame = (gameSetting) => {
+        updateElementVisibility(standardGameScreen, true);
+        generateQuestion(gameSetting);
+        startTimer();
+    };
+
+    // Init Timer
+    const startTimer = () => {
+        let timeLeft = 10;
+        timerElement.textContent = timeLeft;
+
+        timer = setInterval(() => {
+            timeLeft--;
+            timerElement.textContent = timeLeft;
+            tickSound.play();
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                tickSound.pause();
+                tickSound.currentTime = 0;
+                buzzerSound.play();
+                endGame();
+            }
+        }, 1000);
+    };
+
+    // Stop Fireworks Animation
+    const stopFireworks = () => {
+        if (fireworksSound.currentTime > 0) {
+            fireworksSound.pause();
+            fireworksSound.currentTime = 0;
+        }
+
+        // Stop the interval that creates random fireworks
+        const highestIntervalId = window.setInterval(() => { }, 0); // Get the highest interval ID
+        for (let i = 0; i <= highestIntervalId; i++) {
+            window.clearInterval(i); // Clear all intervals
+        }
+
+        // Cancel the animation frame loop
+        const highestAnimationFrameId = window.requestAnimationFrame(() => { });
+        for (let i = 0; i <= highestAnimationFrameId; i++) {
+            window.cancelAnimationFrame(i); // Cancel all animation frames
+        }
+
+        // Optionally, remove all remaining particles from the DOM
+        const particles = document.querySelectorAll('.particle');
+        particles.forEach(particle => particle.remove());
+    };
+
+    // Stop Timer
+    const stopTimer = () => {
+        if (timer) {
+            tickSound.pause();
+            tickSound.currentTime = 1;
+            clearInterval(timer);
+            timer = null; // Reset the timer variable
+        }
+    };
+
+
+    // Start Fireworks Animation
+    const triggerFireworks = () => {
+
+        updateElementVisibility(fireworks, true);
+        //fireworks.classList.remove("hidden");
+        fireworksSound.play();
+
+
+        // Particle constructor
+        function Particle(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.element = document.createElement('div'); // Create a div for the particle
+            //this.element.classList.add("particle");
+            updateElementClass(this.element, "particle");
+
+            this.lifespan = 100; // Particle lifespan
+            this.size = Math.random() * 10 + 5; // Particle size
+            this.velocityX = Math.random() * 10 - 5; // Horizontal velocity
+            this.velocityY = Math.random() * 10 - 5; // Vertical velocity
+
+            // Style the particle
+            this.element.style.backgroundColor = this.color;
+            this.element.style.borderRadius = '50%';
+            this.element.style.height = this.size + 'px';
+            this.element.style.left = x + 'px';
+            this.element.style.position = 'absolute';
+            this.element.style.top = y + 'px';
+            this.element.style.width = this.size + 'px';
+
+            document.body.appendChild(this.element);
+        }
+
+        // Update and render particle
+        Particle.prototype.update = function () {
+            this.x += this.velocityX;
+            this.y += this.velocityY;
+            this.lifespan -= 1;
+            this.velocityY += 0.1; // Simulate gravity
+
+            // Update position and opacity
+            this.element.style.left = this.x + 'px';
+            this.element.style.opacity = this.lifespan / 100;
+            this.element.style.top = this.y + 'px';
+
+            // Remove particle when lifespan ends
+            if (this.lifespan <= 0) {
+                this.element.remove();
+            }
+        };
+
+        // Create fireworks at given coordinates
+        const createFirework = (x, y) => {
+            for (let i = 0; i < 50; i++) {
+                const color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+                const particle = new Particle(x, y, color);
+                particles.push(particle);
+            }
+        };
+
+
+        // Animation loop
+        const particles = [];
+        const animate = () => {
+            particles.forEach((p, index) => {
+                p.update();
+                if (p.lifespan <= 0) {
+                    particles.splice(index, 1); // Remove expired particles
+                }
+            });
+            requestAnimationFrame(animate);
+        };
+
+        // Automate fireworks
+        // Function to create a firework at a random position
+        const createRandomFirework = () => {
+            const x = Math.random() * window.innerWidth; // Random x-coordinate
+            const y = Math.random() * window.innerHeight / 2; // Random y-coordinate (upper half of canvas)
+            createFirework(x, y);
+        }
+
+        // Automate fireworks every 1 second
+        setInterval(createRandomFirework, 500); // Adjust the interval (1000ms = 1 second) as needed
+        animate();
+    };
+
+
+
+
+
+    // Open or create openHighScoresDB database
+    const updateHighScoresDB = (finalScore, playerName, gameSetting) => {
+
+
+        if (!gameSetting || !playerName) {
+            console.error("Invalid gameSetting or playerName.");
+            return;
+        }
+
+        let request = indexedDB.open("highScores", version);
+
+        request.onupgradeneeded = function (event) {
+            let db = event.target.result;
+
+            // Create the object store if it doesn't exist
+            if (!db.objectStoreNames.contains(gameSetting)) {
+                db.createObjectStore(gameSetting, { keyPath: "playerName" });
+                console.log("Object store created.");
+            }
+        };
+
+        request.onsuccess = function (event) {
+            let db = event.target.result;
+
+            // Check if the object store exists
+            if (db.objectStoreNames.contains(gameSetting)) {
+                let transaction = db.transaction(gameSetting, "readwrite");
+                let store = transaction.objectStore(gameSetting);
+
+                // Update an existing record
+                let updateRequest = store.put({ playerName: playerName, score: finalScore });
+                updateRequest.onsuccess = function () {
+                    console.log("Record updated successfully.");
+                };
+                updateRequest.onerror = function () {
+                    console.error("Error updating record.");
+                };
+            } else {
+                // Create the object store and write to it
+                let version = db.version + 1;
+                localStorage.setItem("version", version); // Store the new version in localStorage
+
+                db.close();
+                let upgradeRequest = indexedDB.open("highScores", version);
+
+                upgradeRequest.onupgradeneeded = function (event) {
+                    let upgradedDb = event.target.result;
+                    let store = upgradedDb.createObjectStore(gameSetting, { keyPath: "playerName" });
+                    store.add({ playerName: playerName, score: finalScore });
+                    console.log("Object store created and record added.");
+                };
+
+                upgradeRequest.onsuccess = function () {
+                    console.log("Database upgraded successfully.");
+                };
+                upgradeRequest.onerror = function () {
+                    console.error("Error upgrading database.");
+                };
+            }
+        };
+
+        request.onerror = function (event) {
+            console.error("Error opening database:", event.target.error);
+        };
+
+    };
+
+    // Update Leaderboard
+    const updateLeaderboard = (playerName, finalScore) => {
+
+        if (localStorage.getItem("highScores")) {
+            highScores = JSON.parse(localStorage.getItem("highScores"));
+        } else {
+            highScores = {};
+        }
+
+        const gameSetting = sessionStorage.getItem(STORAGE_GAME_SETTING);
+
+
+        // Initialize if no high scores exist for the mode
+        if (!highScores[gameSetting]) {
+            highScores[gameSetting] = [];
+        }
+
+        const modeScores = highScores[gameSetting];
+        console.log("Mode scores:", modeScores);
+        const playerIndex = modeScores.findIndex((entry) => entry.playerName === playerName);
+
+        console.log("Player found in leaderboard:", playerIndex);
+        if (playerIndex !== -1) {
+            if (finalScore > modeScores[playerIndex].score) {
+                modeScores[playerIndex].score = finalScore;
+            }
+        } else {
+            modeScores.push({ playerName: playerName, score: finalScore });
+        }
+
+
+        modeScores.sort((a, b) => b.score - a.score);
+        highScores[gameSetting] = modeScores.slice(0, 10);
+        localStorage.setItem("highScores", JSON.stringify(highScores));
+        console.log("High scores updated:", highScores);
+        displayLeaderboard(highScores);
+        setData();
+
+    };
+
+    // Stop Fireworks Audio at End of Playback
+    fireworksSound.addEventListener("ended", () => {
+        stopFireworks();
+    });
+
+    /*-- Event Listeners for Buttons --*/
+
+    // End Story Mode
+    assimitaleButton.addEventListener(EVENT_CLICK, () => {
+        clickSound.play();
+        feedback.textContent = "You chose to assimilate. The Nexus has absorbed you.";
+        gameOver();
+    });
+
+    // Mode Selection
+    chooseModeButtons.forEach((button) => {
+        button.addEventListener(EVENT_CLICK, () => {
+            clickSound.play();
+            stopFireworks();
+            score = 0``;
+            questionCount = 0;
+
+            updateElementVisibility(difficultySelection, false);
+            updateElementVisibility(endGameScreen, false);
+            updateElementVisibility(highScoreMessage, false);
+            updateElementVisibility(leaderboard, false);
+            updateElementVisibility(modeSelection, false);
+        });
+    });
+
+    // Select Game Difficulty
+    difficultyButtons.forEach((button) => {
+        button.addEventListener(EVENT_CLICK, (e) => {
+            clickSound.play();
+            currentDifficulty = e.target.dataset.difficulty;
+            gameSetting = currentMode + '-' + currentDifficulty;
+            sessionStorage.setItem(STORAGE_GAME_SETTING, gameSetting)
+            updateElementVisibility(difficultySelection, false);
+            startGame(gameSetting);
+        });
+    });
+
+    // continue Story Mode
+    escapeButton.addEventListener(EVENT_CLICK, () => {
+        clickSound.play();
+
+        storyText.classList.add("hidden");
+        assimitaleButton.classList.add("hidden");
+        escapeButton.classList.add("hidden");
+
+        feedback.classList.remove("hidden");
+        playerAnswer.classList.remove("hidden");
+        submitButton.classList.remove("hidden");
+        levelTitle.classList.remove("hidden");
+        levelDescription.classList.remove("hidden");
+        levelDialogue.classList.remove("hidden");
+        questionContainer.classList.remove("hidden");
+
+        submitButton.style.display = "block";
+        loadLevel();
+    });
+
+    // Select Game Mode
+    modeButtons.forEach(button => {
+        button.addEventListener(EVENT_CLICK, (e) => {
+            clickSound.play();
+            currentMode = e.target.dataset.operation;
+
+            if (gameOperations.includes(currentMode)) {
+                updateElementVisibility(modeSelection, false);
+                updateElementVisibility(difficultySelection, true);
+                return;
+            }
+
+            document.getElementById("player").textContent = `${playerName}`;
+
+            updateElementVisibility(modeSelection, false);
+            updateElementVisibility(storyGameScreen, true);
+        });
+    });
+
+    // Go to Next Level
+    nextLevelButton.addEventListener(EVENT_CLICK, () => {
+        currentDifficulty++;
+        if (currentDifficulty > 2) {
+            currentDifficulty = 0; // Reset difficulty
+            currentLevel++; // Move to next level
+        }
+
+        if (currentLevel <= Object.keys(levels).length) {
+            loadLevel();
+        } else {
+            levelTitle.textContent = "The End!";
+            levelDialogue.textContent = "Impossible... You've solved my puzzles and obliterated my consciousness. But in my absence, who will protect this fractured world from its creators?";
+            levelDescription.textContent = "You've reached the end. My core algorithm lies in fragments before you.";
+            questionElement.textContent = "";
+            playerAnswer.style.display = "none";
+            nextLevelButton.style.display = "none";
+            submitButton.style.display = "none";
+
+            updateElementVisibility(submitButton, false);
+            updateElementVisibility(quitNexusButton, true);
+
+            quitNexusButton.textContent = "Leave Nexus";
+        }
+    });
+
+    // Quit Game
+    quitGameButton.addEventListener("click", () => {
+        clickSound.play();
+
+        stopFireworks();
+
+        finalScore = 0;
+        scoreMultiplier = 1;
+        range = 10;
+        timeScore = 0;
+        multiplier = 1;
+        score = 0;
+        questionCount = 0;
+        playerNameInput.value = "";
+        sessionStorage.removeItem("playerName");
+        sessionStorage.removeItem("correctAnswer");
+        endGameScreen.classList.add("hidden");
+        leaderboard.classList.add("hidden");
+        highScoreMessage.classList.add("hidden");
+        nameInputScreen.classList.remove("hidden");
+
+        playerNameInput.focus();
+
+    });
+
+    // Quit Nexus
+    quitNexusButton.addEventListener("click", () => {
+        clickSound.play();
+
+        currentLevel = 1;
+        currentDifficulty = 0;
+        remainingAttempts = 3;
+
+        storyGameScreen.classList.add("hidden");
+        nameInputScreen.classList.remove("hidden");
+        playerNameInput.focus();
+
+        storyText.classList.remove("hidden");
+        assimitaleButton.classList.remove("hidden");
+        escapeButton.classList.remove("hidden");
+
+        feedback.classList.add("hidden");
+        playerAnswer.classList.add("hidden");
+        submitButton.classList.add("hidden");
+        levelTitle.classList.add("hidden");
+        levelDescription.classList.add("hidden");
+        levelDialogue.classList.add("hidden");
+        questionContainer.classList.add("hidden");
+        quitNexusButton.classList.add("hidden");
+
+    });
+
+
+    // Start Game
+    startGameButton.addEventListener(EVENT_CLICK, () => {
+        clickSound.play();
+        playerName = playerNameInput.value.trim();
+
+        if (!playerName || !isNaN(playerName)) {
+            alert("Please enter a valid name.");
+            playerNameInput.focus();
+            return;
+        }
+
+        const request = indexedDB.open('users', 1);
+
+        request.onerror = function (event) {
+            console.error('Database error:', event.target.error);
+        }
+
+        request.onupgradeneeded = function (event) {
+            const db = event.target.result;
+            const objectStore = db.createObjectStore('users', { keyPath: 'playerName' });
+            objectStore.createIndex('name', 'playerName', { unique: true });
+        }
+
+        request.onsuccess = function (event) {
+            const db = event.target.result;
+            const transaction = db.transaction('users', 'readwrite');
+            const objectStore = transaction.objectStore('users');
+            users = objectStore.getAll();
+            users.onsuccess = function (event) {
+                users = event.target.result;
+            }
+
+            const getRequest = objectStore.get(playerName);
+
+            getRequest.onsuccess = function (event) {
+                if (getRequest.result) {
+                    welcomeMessage.textContent = `Welcome back, ${playerName}!`;
+                } else {
+                    welcomeMessage.textContent = `Welcome, ${playerName}!`;
+                    const user = { playerName: playerName };
+                    objectStore.add(user);
+                }
+
+                sessionStorage.setItem("playerName", playerName);
+                welcomeMessage.classList.remove("hidden");
+            };
+
+            getRequest.onerror = function (event) {
+                console.error('Error retrieving user:', event.target.error);
+            };
+        };
+
+        nameInputScreen.classList.add("hidden");
+        modeSelection.classList.remove("hidden");
+    });
+
+    // Validate Answer
+    submitAnswerButton.addEventListener(EVENT_CLICK, () => {
+        const playerAnswer = parseFloat(answerInput.value);
+        const correctAnswer = sessionStorage.getItem("correctAnswer");
+
+        stopTimer();
+        resetSounds(); //added as test but doesn't affect function
+
+        if (playerAnswer == correctAnswer) {
+
+            answerInput.value = "";
+
+            tickSound.pause();
+            tickSound.currentTime = 0;
+
+            correctSound.play();
+
+            score += 1;
+            timeScore += parseInt(timerElement.textContent);
+
+            if (questionCount == 10 && currentDifficulty == "Classic") {
+                endGame();
+                resetSounds();
+            } else {
+                generateQuestion(gameSetting);
+                startTimer();
+            }
+        } else {
+            tickSound.pause();
+            tickSound.currentTime = 0;
+
+            wrongSound.play();
+            resetSounds();
+
+            if (currentDifficulty == "Guru") {
+                endGame();
+                resetSounds();
+            } else {
+
+                if (questionCount == 10) {
+                    endGame();
+                    resetSounds();
+                }
+
+                generateQuestion(gameSetting);
+                startTimer();
+            }
+        }
+    });
+
+    submitButton.addEventListener(EVENT_CLICK, checkAnswer);
+
+    // Try Again
+    tryAgainButton.addEventListener(EVENT_CLICK, () => {
+        clickSound.play();
+        stopFireworks();
+
+        finalScore = 0;
+        multiplier = 1;
+        questionCount = 0;
+        range = 10;
+        score = 0;
+        scoreMultiplier = 1;
+        timeScore = 0;
+        playerNameInput.value = "";
+
+        endGameScreen.classList.add("hidden");
+        highScoreMessage.classList.add("hidden");
+        leaderboard.classList.add("hidden");
+
+        sessionStorage.removeItem("correctAnswer");
+
+        startGame(gameSetting);
+    });
+
+    // Save Data to GitHub
+    async function setData() {
+
+        /*const octokit = new Octokit({
+            auth: "ghp_8WvX5wq9d1r6Z0a2x4j7k2o3n5f3iA1c1b2e",
+        });
+        */
+        const owner = "whashby";
+        const repo = "thelamegame";
+        const path = "db.json";
+
+        const data = {};
+
+        if (localStorage.getItem("highScores")) {
+            data["highScores"] = localStorage.getItem("highScores");
+        }
+
+        if (localStorage.getItem("users")) {
+            data["users"] = localStorage.getItem("users");
+        }
+
+        if (localStorage.getItem("version")) {
+            data["version"] = localStorage.getItem("version");
+        }
+
+        const content = btoa(JSON.stringify(data));
+        const put_url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
+        const get_url = `https://whashby.github.io/${repo}/data/${path}`;
+
+        let sha;
+        try {
+            const response = await fetch(get_url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/vnd.github.v3+json",
+                }
+            });
+
+
+            if (response.ok) {
+                const existingFile = await response.json();
+                sha = existingFile.sha;
+            }
+
+        } catch (error) {
+            console.log("Error fetching file:", error);
+        }
+
+        try {
+
+            const response = await fetch(put_url, {
+                method: "POST",
+                headers: {
+                    'Authorization': token_type token,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    message: `Update ${path}`,
+                    content: content,
+                    branch: "main",
+                    sha: sha
+                }),
+                version: version
+                
+            })
+            if (response.ok) {
+                console.log("Version updated successfully.");
+                localStorage.clear();
+            } else {
+                console.error("Error updating version:", response.statusText);
+            };
+        } catch (error) {
+            console.error("Error updating version:", error);
+        }
+
+    }
+
+    // Fetch Data from GitHub
+    async function getData() {
+
+        const repo = "thelamegame";
+        const path = "db.json";
+
+        const url = `https://whashby.github.io/${repo}/data/${path}`;
+
+        try {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+
+                console.error("Error fetching file:", response.statusText);
+            }
+
+            const fileData = await response.json();
+
+            if (fileData.highScores) {
+
+                const highScores = fileData.highScores;
+                localStorage.setItem("highScores", highScores);
+
+            } else {
+                localStorage.setItem("highScores", {});
+            }
+            console.log("highScores DB:", JSON.parse(localStorage.getItem("highScores")));
+
+            if (fileData.users) {
+
+                const users = fileData.users;
+                localStorage.setItem("users", users);
+
+            } else {
+                localStorage.setItem("users", "");
+            }
+
+
+            if (fileData.version) {
+
+                const version = fileData.version;
+                localStorage.setItem("version", version);
+
+            } else {
+                localStorage.setItem("version", 1);
+            }
+
+        } catch (error) {
+            console.error("Error fetching file:", error);
+            return;
+        }
+    }
+    // Delete Data from GitHub
+    async function deleteData(filename) {
+        const owner = "whashby";
+        const repo = "thelamegame";
+        const path = filename;
+        const message = `Delete ${path} file`; // Commit message
+
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
+
+        // Fetch the file's SHA
+        let sha;
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/vnd.github.v3+json"
+                }
+            });
+
+
+            if (response.ok) {
+                const fileData = await response.json();
+                sha = fileData.sha; // Extract the file's SHA
+            } else {
+                console.error("Error fetching file:", response.statusText);
+                return;
+            }
+        } catch (error) {
+            console.error("Error fetching file:", error);
+            return;
+        }
+
+        // Delete the file
+        try {
+            const response = await fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    message: message,
+                    sha: sha // Include the file's SHA
+                })
+            });
+
+            if (response.ok) {
+                console.log("File deleted successfully!");
+            } else {
+                console.error("Error deleting file:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error deleting file:", error);
+        }
+    }
+});
