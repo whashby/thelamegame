@@ -1102,7 +1102,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(put_url, {
                 method: "POST",
                 headers: {
-                    'Authorization': `Bearer ${{ secrets.GITHUB_TOKEN }}`,
+                    'Authorization': `Bearer ${token}`,
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
