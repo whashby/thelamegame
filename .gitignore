@@ -1,4 +1,5 @@
-*.vsidx
-.vs/slnx.sqlite
-*.db-wal
-.vs/thelamegame/v17/.wsuo
+.env
+.vsidx
+.vs
+.db-wal
+.wsuo
