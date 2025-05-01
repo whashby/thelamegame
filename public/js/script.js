@@ -1054,7 +1054,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const owner = "whashby";
         const repo = "thelamegame";
         const path = "db.json";
-        const token = "11AAGPC4I0xJQFlZPINn1C_fN3RCp53CbDThvWKgJNSlBGFBFQ82ucWCWKt3NY1SQsGWVSJHP6WcKRJ4le"
+        const token = "5tMNHAs3K8fBqBg5dCjVr9wvVWdW2d2gsP5m"
 
         const data = {};
 
@@ -1098,7 +1098,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(put_url, {
                 method: "POST",
                 headers: {
-                    'Authorization': `Bearer github_pat_${token}`,
+                    'Authorization': `Bearer gho_${token}`,
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
