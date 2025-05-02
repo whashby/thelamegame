@@ -794,7 +794,7 @@ document.addEventListener("DOMContentLoaded", () => {
             updateElementVisibility(endGameScreen, false);
             updateElementVisibility(highScoreMessage, false);
             updateElementVisibility(leaderboard, false);
-            updateElementVisibility(modeSelection, false);
+            updateElementVisibility(modeSelection, true);
         });
     });
 
