@@ -1102,7 +1102,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     branch: "main",
                     sha: sha
                 }),
-                version: version
                 
             })
             if (response.ok) {
