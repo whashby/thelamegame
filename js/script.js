@@ -387,7 +387,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const { title, description, generateQuestion } = level;
 
 
-        levelTitle.textContent = `${title} - ${["Easy", "Medium", "Hard"][currentDifficulty]}`;
+        levelTitle.textContent = `${title} - (${["Easy", "Medium", "Hard"][currentDifficulty]})`;
         levelDescription.textContent = description;
 
         currentQuestion = generateQuestion(currentDifficulty);
@@ -395,6 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
         feedback.textContent = "";
         playerAnswer.value = "";
         nextLevelButton.style.display = "none";
+        
     };
 
 
