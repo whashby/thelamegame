@@ -981,7 +981,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         updateElementClass(nameInputScreen, true);
-        updateElementClass(modeSelectionScreen, false);
+        updateElementVisibility(modeSelectionScreen, true);
     });
 
     // Validate Answer
