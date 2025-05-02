@@ -783,9 +783,13 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener(EVENT_CLICK, () => {
             clickSound.play();
             stopFireworks();
-            score = 0``;
+            finalScore = 0;
+            scoreMultiplier = 1;
+            range = 10;
+            timeScore = 0;
+            multiplier = 1;
+            score = 0;
             questionCount = 0;
-
             updateElementVisibility(difficultySelection, false);
             updateElementVisibility(endGameScreen, false);
             updateElementVisibility(highScoreMessage, false);
