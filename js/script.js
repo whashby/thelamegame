@@ -813,6 +813,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // continue Story Mode
     escapeButton.addEventListener(EVENT_CLICK, () => {
         clickSound.play();
+        currentDifficulty = 0;
 
         storyText.classList.add("hidden");
         assimitaleButton.classList.add("hidden");
