@@ -980,8 +980,8 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         };
 
-        updateElementClass(nameInputScreen, true);
-        updateElementClass(modeSelectionScreen, false);
+        updateElementVisibility(nameInputScreen, true);
+        updateElementVisibility(modeSelectionScreen, false);
     });
 
     // Validate Answer
