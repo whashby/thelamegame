@@ -4,26 +4,27 @@ body {
 	text-align: center;
 	margin: 0 auto;
 	padding: 0;
+	padding-top: 20vh;
 	background-color: #f9f9f9;
-	background-image:url("../img/nb8dkyx9.png");
+	background-image: url("../img/nb8dkyx9.png");
 	background-repeat: repeat;
 	background-size: 15%;
-	max-width: 900px;
+	max-width: 900vw;
 	overflow: hidden;
 }
 
 .grid {
 	display: grid;
 	grid-template-columns: auto auto;
-	gap: 40px;
+	gap: 40vw;
 	justify-content: center;
-	margin: 40px auto;
+	margin: 40vh auto;
 	width: 50%;
 }
 
 .grid button {
-    width: 150px;
-    height: 150px;
+    width: 150vw;
+    height: 150vh;
     padding: 10px;
     text-align: center;
 }
@@ -83,7 +84,7 @@ body {
 button {
 	font-size: 20px;
 	font-weight: 500;
-    padding: 25px 35px;
+    padding: 25vh 35vw;
     background-color: #000000;
     color: white;
     border: none;
@@ -98,7 +99,7 @@ button:hover {
 
 input {
     font-size: 20px;
-    padding: 10px 20px;
+    padding: 10vh 20vw;
     border: solid thin #007bff;
     border-radius: 5px;
 }
