@@ -57,7 +57,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // Set initial volume and playback time
+    buzzerSound.volume = 0.5;
+    buzzerSound.currentTime = 0.5;
+    clickSound.volume = 0.5;
+    clickSound.currentTime = 0.5;
+    correctSound.volume = 0.5;
+    correctSound.currentTime = 0.5;
     fireworksSound.volume = 0.3;
+    fireworksSound.currentTime = 0.5;
+    wrongSound.volume = 0.5;
+    wrongSound.currentTime = 0.5;
+    tickSound.volume = 0.5;
     tickSound.currentTime = 1;
 
     // Game state variables 
