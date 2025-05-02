@@ -395,7 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
         feedback.textContent = "";
         playerAnswer.value = "";
         nextLevelButton.style.display = "none";
-        
+
     };
 
 
@@ -794,7 +794,7 @@ document.addEventListener("DOMContentLoaded", () => {
             updateElementVisibility(endGameScreen, false);
             updateElementVisibility(highScoreMessage, false);
             updateElementVisibility(leaderboard, false);
-            updateElementVisibility(modeSelection, false);
+            updateElementVisibility(modeSelection, true);
         });
     });
 
@@ -1118,7 +1118,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     sha: sha
                 }),
                 version: version
-                
+
             })
             if (response.ok) {
                 console.log("Version updated successfully.");
