@@ -1093,7 +1093,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(put_url, {
                 method: "PUT",
                 headers: {
-                    'Authorization': `Bearer gho_${token}`,
+                    'Authorization': `gho_${token}`,
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
