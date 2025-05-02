@@ -3,14 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const answerInput = document.getElementById("answerInput");
     const chooseModeButtons = document.querySelectorAll(".chooseModeBtn");
     const difficultyButtons = document.querySelectorAll(".difficultyBtn");
-    const difficultySelection = document.getElementById("difficultySelection");
+    const difficultySelectionScreen = document.getElementById("difficultySelectionScreen");
     const endGameScreen = document.getElementById("endGameScreen");
     const fireworks = document.getElementById("fireworks");
     const highScoreMessage = document.getElementById("highScoreMessage");
     const leaderboard = document.getElementById("leaderboard");
     const leaderboardList = document.getElementById("leaderboardList");
     const modeButtons = document.querySelectorAll(".modeBtn");
-    const modeSelection = document.getElementById("modeSelection");
+    const modeSelectionScreen = document.getElementById("modeSelectionScreenScreen");
     const multiplierBonus = document.getElementById("multiplierBonus");
     const nameInputScreen = document.getElementById("nameInputScreen");
     const playerNameInput = document.getElementById("playerName");
@@ -790,11 +790,11 @@ document.addEventListener("DOMContentLoaded", () => {
             multiplier = 1;
             score = 0;
             questionCount = 0;
-            updateElementVisibility(difficultySelection, false);
+            updateElementVisibility(difficultySelectionScreen, false);
             updateElementVisibility(endGameScreen, false);
             updateElementVisibility(highScoreMessage, false);
             updateElementVisibility(leaderboard, false);
-            updateElementVisibility(modeSelection, true);
+            updateElementVisibility(modeSelectionScreen, true);
         });
     });
 
@@ -805,7 +805,7 @@ document.addEventListener("DOMContentLoaded", () => {
             currentDifficulty = e.target.dataset.difficulty;
             gameSetting = currentMode + '-' + currentDifficulty;
             sessionStorage.setItem(STORAGE_GAME_SETTING, gameSetting)
-            updateElementVisibility(difficultySelection, false);
+            updateElementVisibility(difficultySelectionScreen, false);
             startGame(gameSetting);
         });
     });
@@ -837,14 +837,14 @@ document.addEventListener("DOMContentLoaded", () => {
             currentMode = e.target.dataset.operation;
 
             if (gameOperations.includes(currentMode)) {
-                updateElementVisibility(modeSelection, false);
-                updateElementVisibility(difficultySelection, true);
+                updateElementVisibility(modeSelectionScreen, false);
+                updateElementVisibility(difficultySelectionScreen, true);
                 return;
             }
 
             document.getElementById("player").textContent = `${playerName}`;
 
-            updateElementVisibility(modeSelection, false);
+            updateElementVisibility(modeSelectionScreen, false);
             updateElementVisibility(storyGameScreen, true);
         });
     });
@@ -980,8 +980,8 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         };
 
-        nameInputScreen.classList.add("hidden");
-        modeSelection.classList.remove("hidden");
+        updateElementVisibility(nameInputScreen, false);
+        updateElementVisibility(modeSelectionScreen, true);
     });
 
     // Validate Answer
@@ -1050,9 +1050,9 @@ document.addEventListener("DOMContentLoaded", () => {
         timeScore = 0;
         playerNameInput.value = "";
 
-        endGameScreen.classList.add("hidden");
-        highScoreMessage.classList.add("hidden");
-        leaderboard.classList.add("hidden");
+        updateElementVisibility(endGameScreen, false);
+        updateElementVisibility(highScoreMessage, false);
+        updateElementVisibility(leaderboard, false);
 
         sessionStorage.removeItem("correctAnswer");
 
