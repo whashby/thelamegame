@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const answerInput = document.getElementById("answerInput");
     const chooseModeButtons = document.querySelectorAll(".chooseModeBtn");
     const difficultyButtons = document.querySelectorAll(".difficultyBtn");
-    const difficultySelectionScreen= document.getElementById("difficultySelectionScreen");
+    const difficultySelectionScreen = document.getElementById("difficultySelectionScreen");
     const endGameScreen = document.getElementById("endGameScreen");
     const fireworks = document.getElementById("fireworks");
     const highScoreMessage = document.getElementById("highScoreMessage");
@@ -980,8 +980,8 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         };
 
-        updateElementVisibility(nameInputScreen, true);
-        updateElementVisibility(modeSelectionScreen, false);
+        updateElementClass(nameInputScreen, false);
+        updateElementClass(modeSelectionScreen, true);
     });
 
     // Validate Answer
