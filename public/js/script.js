@@ -187,6 +187,8 @@ document.addEventListener("DOMContentLoaded", () => {
             range += Math.floor(questionCount / 10) * 10;
         }
 
+        scoreMultiplier = Math.floor(questionCount / 10) + 1; // Increase multiplier every 10 questions
+
         let num1 = Math.floor(Math.random() * range) + 1;
         let num2 = Math.floor(Math.random() * range) + 1;
         const operator =
