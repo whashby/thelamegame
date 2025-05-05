@@ -44,12 +44,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // Game sounds
-    const buzzerSound = new Audio("sounds/buzzer.mp3");
-    const clickSound = new Audio("sounds/click.mp3");
-    const correctSound = new Audio("sounds/correct.mp3");
-    const fireworksSound = new Audio("sounds/fireworks.mp3");
-    const tickSound = new Audio("sounds/tick.mp3");
-    const wrongSound = new Audio("sounds/wrong.mp3");
+    const buzzerSound = new Audio("https://whashby.github.io/sounds/buzzer.mp3");
+    const clickSound = new Audio("https://whashby.github.io/sounds/click.mp3");
+    const correctSound = new Audio("https://whashby.github.io/sounds/correct.mp3");
+    const fireworksSound = new Audio("https://whashby.github.io/sounds/fireworks.mp3");
+    const tickSound = new Audio("https://whashby.github.io/sounds/tick.mp3");
+    const wrongSound = new Audio("https://whashby.github.io/sounds/wrong.mp3");
 
     const CLASS_HIDDEN = "hidden";
     const EVENT_CLICK = "click";

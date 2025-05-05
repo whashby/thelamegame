@@ -4,3 +4,10 @@
 .db-wal
 .wsuo
 js/script.js.txt
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
