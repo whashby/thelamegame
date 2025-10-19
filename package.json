@@ -1,0 +1,14 @@
+{
+  "name": "playwright-tests",
+  "version": "1.0.0",
+  "description": "Automated browser tests using Playwright",
+  "scripts": {
+    "test": "npx playwright test",
+    "install:browsers": "npx playwright install --with-deps"
+  },
+  "author": "Wafiq Harris-Ashby",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.43.1"
+  }
+}
